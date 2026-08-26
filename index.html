@@ -133,8 +133,9 @@
                 gap: 2px 14px !important;
                 max-height: none !important;
                 overflow: visible !important;
-                break-inside: avoid !important;
-                page-break-inside: avoid !important;
+                break-inside: auto !important;
+                page-break-inside: auto !important;
+                margin-top: 6px !important;
                 margin-bottom: 8px !important;
             }
             .fita-item-numero {
@@ -1657,7 +1658,7 @@
         function imprimirFita(banco) {
             const fita = document.getElementById(`titulo-${banco}`).closest('.bg-white');
             const clone = fita.cloneNode(true);
-            clone.classList.add('area-impressao');
+            clone.className = 'area-impressao bg-white w-full';
             clone.querySelectorAll('button').forEach(b => b.remove());
 
             const outros = Array.from(document.body.children);
