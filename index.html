@@ -37,21 +37,23 @@
         /* ============ PRINT ============ */
         .detalhes-impressao { display: none; }
         @media print {
-            @page { size: auto; margin: 8mm; }
-            body, html { height: 100%; background: white !important; margin: 0 !important; padding: 0 !important; }
+            @page { size: auto; margin: 10mm; }
+            body, html { height: auto !important; background: white !important; margin: 0 !important; padding: 0 !important; }
             body * { visibility: hidden !important; }
             .area-impressao, .area-impressao * { visibility: visible !important; }
             .area-relatorio-print, .area-relatorio-print * { visibility: visible !important; }
             .area-impressao {
-                position: absolute !important; left: 0 !important; top: 0 !important;
+                position: static !important;
+                display: block !important;
                 width: 100% !important; background: white !important;
-                box-shadow: none !important; margin: 0 !important; padding: 15px !important;
+                box-shadow: none !important; margin: 0 !important; padding: 0 !important;
             }
             .area-impressao .detalhes-impressao { display: block !important; }
             .area-impressao button { display: none !important; }
             .area-relatorio-print {
-                position: absolute !important; left: 0 !important; top: 0 !important;
-                width: 100% !important; background: white !important; padding: 20px !important;
+                position: static !important;
+                display: block !important;
+                width: 100% !important; background: white !important; padding: 0 !important;
             }
         }
 
@@ -108,22 +110,38 @@
         /* ============ TFOOT ============ */
         #tfoot-totais tr td { padding: 5px 16px; font-size: 0.8rem; }
 
-        /* ============ FITA EM COLUNAS ============ */
-        .fita-colunas {
-            display: block;
-            columns: 2 105px;
-            column-gap: 12px;
-            column-rule: 1px dashed #cbd5e1;
-            max-height: 270px;
+        /* ============ FITA EM GRID (ESTÁVEL E COMPACTO) ============ */
+        .fita-grid-numeros {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 2px 8px;
+            max-height: 240px;
             overflow-y: auto;
             text-align: right;
             padding-right: 4px;
         }
+        .fita-item-numero {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.8rem;
+            text-align: right;
+            white-space: nowrap;
+        }
         @media print {
-            .fita-colunas {
-                columns: 3 115px !important;
-                max-height: 480px !important;
+            .fita-grid-numeros {
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 2px 14px !important;
+                max-height: none !important;
                 overflow: visible !important;
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+                margin-bottom: 8px !important;
+            }
+            .fita-item-numero {
+                font-size: 10px !important;
+                font-family: monospace !important;
+                text-align: right !important;
+                white-space: nowrap !important;
             }
         }
 
@@ -379,8 +397,8 @@
                     <div>
                         <div id="titulo-itau" class="text-green-700 font-bold text-xs text-center border-b-2 border-green-700 w-full pb-1 mb-2">ITAÚ - 0 PAGAMENTOS</div>
                         <div class="w-0 h-0 border-l-[12px] border-l-transparent border-t-[12px] border-t-green-500 border-r-[12px] border-r-transparent self-start mb-2"></div>
-                        <div class="fita-colunas font-mono text-right text-gray-600 text-sm leading-relaxed">
-                            <span id="soma-itau">0,00 +<br></span>
+                        <div id="soma-itau" class="fita-grid-numeros mb-2">
+                            <div class="fita-item-numero">0,00 +</div>
                         </div>
                         <div class="border-t-2 border-gray-400 my-2 pt-1 flex justify-between items-center font-mono">
                             <span class="text-xs font-bold text-gray-600">TOTAL</span>
@@ -395,8 +413,8 @@
                     <div>
                         <div id="titulo-santander" class="text-yellow-600 font-bold text-xs text-center border-b-2 border-yellow-600 w-full pb-1 mb-2">SANTANDER - 0 PAGAMENTOS</div>
                         <div class="w-0 h-0 border-l-[12px] border-l-transparent border-t-[12px] border-t-[#ccff00] border-r-[12px] border-r-transparent self-start mb-2"></div>
-                        <div class="fita-colunas font-mono text-right text-gray-600 text-sm leading-relaxed">
-                            <span id="soma-santander">0,00 +<br></span>
+                        <div id="soma-santander" class="fita-grid-numeros mb-2">
+                            <div class="fita-item-numero">0,00 +</div>
                         </div>
                         <div class="border-t-2 border-gray-400 my-2 pt-1 flex justify-between items-center font-mono">
                             <span class="text-xs font-bold text-gray-600">TOTAL</span>
@@ -411,8 +429,8 @@
                     <div>
                         <div id="titulo-bradesco" class="text-orange-600 font-bold text-xs text-center border-b-2 border-orange-600 w-full pb-1 mb-2">BRADESCO - 0 PAGAMENTOS</div>
                         <div class="w-0 h-0 border-l-[12px] border-l-transparent border-t-[12px] border-t-orange-500 border-r-[12px] border-r-transparent self-start mb-2"></div>
-                        <div class="fita-colunas font-mono text-right text-gray-600 text-sm leading-relaxed">
-                            <span id="soma-bradesco">0,00 +<br></span>
+                        <div id="soma-bradesco" class="fita-grid-numeros mb-2">
+                            <div class="fita-item-numero">0,00 +</div>
                         </div>
                         <div class="border-t-2 border-gray-400 my-2 pt-1 flex justify-between items-center font-mono">
                             <span class="text-xs font-bold text-gray-600">TOTAL</span>
@@ -427,8 +445,8 @@
                     <div>
                         <div id="titulo-caixa" class="text-blue-600 font-bold text-xs text-center border-b-2 border-blue-600 w-full pb-1 mb-2">CAIXA - 0 PAGAMENTOS</div>
                         <div class="w-0 h-0 border-l-[12px] border-l-transparent border-t-[12px] border-t-blue-500 border-r-[12px] border-r-transparent self-start mb-2"></div>
-                        <div class="fita-colunas font-mono text-right text-gray-600 text-sm leading-relaxed">
-                            <span id="soma-caixa">0,00 +<br></span>
+                        <div id="soma-caixa" class="fita-grid-numeros mb-2">
+                            <div class="fita-item-numero">0,00 +</div>
                         </div>
                         <div class="border-t-2 border-gray-400 my-2 pt-1 flex justify-between items-center font-mono">
                             <span class="text-xs font-bold text-gray-600">TOTAL</span>
@@ -443,8 +461,8 @@
                     <div>
                         <div id="titulo-brasil" class="text-pink-600 font-bold text-xs text-center border-b-2 border-pink-600 w-full pb-1 mb-2">BRASIL - 0 PAGAMENTOS</div>
                         <div class="w-0 h-0 border-l-[12px] border-l-transparent border-t-[12px] border-t-pink-500 border-r-[12px] border-r-transparent self-start mb-2"></div>
-                        <div class="fita-colunas font-mono text-right text-gray-600 text-sm leading-relaxed">
-                            <span id="soma-brasil">0,00 +<br></span>
+                        <div id="soma-brasil" class="fita-grid-numeros mb-2">
+                            <div class="fita-item-numero">0,00 +</div>
                         </div>
                         <div class="border-t-2 border-gray-400 my-2 pt-1 flex justify-between items-center font-mono">
                             <span class="text-xs font-bold text-gray-600">TOTAL</span>
@@ -1523,7 +1541,7 @@
                             const vg = somaGrupos[grupoId].valor;
                             dadosBancos[banco].classificacoes[classif].total    += vg;
                             dadosBancos[banco].classificacoes[classif].qtd      += 1;
-                            dadosBancos[banco].classificacoes[classif].fitaItens += `${formatarMoeda(vg)} +<br>`;
+                            dadosBancos[banco].classificacoes[classif].fitaItens += `<div class="fita-item-numero">${formatarMoeda(vg)} +</div>`;
                             dadosBancos[banco].classificacoes[classif].htmlItens +=
                                 `<div style="display:flex;justify-content:space-between;border-bottom:1px dashed #ccc;padding:2px 0;">
                                     <span class="truncate pr-2">${nomeForn} (Agrupado)${ajTag}</span>
@@ -1536,7 +1554,7 @@
                     } else {
                         dadosBancos[banco].classificacoes[classif].total    += valor;
                         dadosBancos[banco].classificacoes[classif].qtd      += 1;
-                        dadosBancos[banco].classificacoes[classif].fitaItens += `${celaVal.innerText} +<br>`;
+                        dadosBancos[banco].classificacoes[classif].fitaItens += `<div class="fita-item-numero">${celaVal.innerText} +</div>`;
                         dadosBancos[banco].classificacoes[classif].htmlItens +=
                             `<div style="display:flex;justify-content:space-between;border-bottom:1px dashed #ccc;padding:2px 0;">
                                 <span class="truncate pr-2">${nomeForn} (Voucher: ${numVouc})${ajTag}</span>
@@ -1597,7 +1615,7 @@
                     elDet.innerHTML  = htmlImp;
                     elTit.closest('.bg-white').classList.remove('opacity-60');
                 } else {
-                    elSoma.innerHTML = `0,00 +<br>`;
+                    elSoma.innerHTML = `<div class="fita-item-numero">0,00 +</div>`;
                     elTot.innerText  = `0,00 *`;
                     elDet.innerHTML  = '';
                     elTit.closest('.bg-white').classList.add('opacity-60');
@@ -1638,19 +1656,17 @@
         // ==========================================
         function imprimirFita(banco) {
             const fita = document.getElementById(`titulo-${banco}`).closest('.bg-white');
-            const pai  = fita.parentNode;
-            const irm  = fita.nextSibling;
+            const clone = fita.cloneNode(true);
+            clone.classList.add('area-impressao');
+            clone.querySelectorAll('button').forEach(b => b.remove());
 
-            const outros = Array.from(document.body.children).filter(el => el !== fita);
+            const outros = Array.from(document.body.children);
             outros.forEach(el => el.style.setProperty('display', 'none', 'important'));
-            document.body.appendChild(fita);
-            fita.classList.add('area-impressao');
+            document.body.appendChild(clone);
 
             window.print();
 
-            fita.classList.remove('area-impressao');
-            if (irm) pai.insertBefore(fita, irm);
-            else      pai.appendChild(fita);
+            clone.remove();
             outros.forEach(el => el.style.removeProperty('display'));
         }
 
