@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartPag - Rede Local &amp; Conciliação</title>
+    <link rel="icon" type="image/png" href="image.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        /* ============ DARK MODE ============ */
+        body.dark-mode { background-color: #111827 !important; color: #f9fafb; }
+        body.dark-mode .bg-white { background-color: #1f2937 !important; color: #f9fafb !important; }
+        body.dark-mode .bg-gray-100 { background-color: #111827 !important; }
+        body.dark-mode .bg-gray-200 { background-color: #374151 !important; color: #e5e7eb !important; }
+        body.dark-mode .bg-gray-50 { background-color: #1f2937 !important; }
+        body.dark-mode .bg-green-50  { background-color: #052e16 !important; }
+        body.dark-mode .bg-yellow-50 { background-color: #422006 !important; }
+        body.dark-mode .bg-orange-50 { background-color: #431407 !important; }
+        body.dark-mode .bg-blue-50   { background-color: #172554 !important; }
+        body.dark-mode .bg-pink-50   { background-color: #500724 !important; }
+        body.dark-mode .text-gray-500 { color: #9ca3af !important; }
+        body.dark-mode .text-gray-600 { color: #d1d5db !important; }
+        body.dark-mode .text-gray-700 { color: #e5e7eb !important; }
+        body.dark-mode .text-gray-800 { color: #f9fafb !important; }
+        body.dark-mode td, body.dark-mode th { border-color: #374151 !important; }
+        body.dark-mode select, body.dark-mode input[type="text"], body.dark-mode input[type="date"] {
+            background-color: #374151 !important; color: #f9fafb !important; border-color: #4b5563 !important;
+        }
+        body.dark-mode .bg-gray-100.select-classificacao { background-color: #374151 !important; color: #e5e7eb !important; }
+        body.dark-mode .hover\:bg-gray-100:hover { background-color: #374151 !important; }
+        body.dark-mode .modal-box { background-color: #1f2937 !important; color: #f9fafb !important; }
+        body.dark-mode .bg-gray-50.regra-tp { background-color: #374151 !important; }
+
+        /* ============ PRINT ============ */
+        .detalhes-impressao { display: none; }
+        @media print {
+            @page { size: auto; margin: 8mm; }
+            body, html { height: 100%; background: white !important; margin: 0 !important; padding: 0 !important; }
+            body * { visibility: hidden !important; }
+            .area-impressao, .area-impressao * { visibility: visible !important; }
+            .area-relatorio-print, .area-relatorio-print * { visibility: visible !important; }
+            .area-impressao {
+                position: absolute !important; left: 0 !important; top: 0 !important;
+                width: 100% !important; background: white !important;
+                box-shadow: none !important; margin: 0 !important; padding: 15px !important;
+            }
+            .area-impressao .detalhes-impressao { display: block !important; }
+            .area-impressao button { display: none !important; }
+            .area-relatorio-print {
+                position: absolute !important; left: 0 !important; top: 0 !important;
+                width: 100% !important; background: white !important; padding: 20px !important;
+            }
+        }
+
+        /* ============ TABLE ============ */
+        .tabela-fixa th { position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.4); }
+        .linha-imposto { background-color: #f9fafb; color: #6b7280; font-style: italic; }
+        .linha-imposto td { font-size: 0.85em; }
+
+        /* ============ DRAG & DROP ============ */
+        #drop-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(67,56,202,0.88); z-index: 9999;
+            justify-content: center; align-items: center; flex-direction: column;
+            color: white; font-weight: bold;
+            border: 6px dashed rgba(255,255,255,0.7);
+            margin: 12px; border-radius: 16px; pointer-events: none;
+            backdrop-filter: blur(4px);
+        }
+        #drop-overlay.ativo { display: flex; }
+
+        /* ============ MODAL ============ */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+        }
+        .modal-box {
+            background: white; border-radius: 14px; padding: 28px;
+            max-width: 700px; width: 95%; max-height: 85vh; overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+        }
+
+        /* ============ BADGE ============ */
+        .badge-pendente {
+            background: #ef4444; color: white; border-radius: 9999px;
+            font-size: 0.68rem; padding: 1px 7px; margin-left: 5px;
+            font-weight: bold; vertical-align: middle; display: inline-block;
+        }
+
+        /* ============ OBS INPUT ============ */
+        .obs-input {
+            border: 1px solid #d1d5db; border-radius: 4px;
+            padding: 2px 6px; font-size: 0.78rem; width: 100%; min-width: 80px;
+            background: transparent; outline: none; transition: border-color 0.2s;
+        }
+        .obs-input:focus { border-color: #6366f1; }
+
+        /* ============ FILTER BAR ============ */
+        .filtro-input {
+            border: 1px solid #d1d5db; border-radius: 6px; padding: 5px 10px;
+            font-size: 0.82rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .filtro-input:focus { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99,102,241,0.15); }
+
+        /* ============ TFOOT ============ */
+        #tfoot-totais tr td { padding: 5px 16px; font-size: 0.8rem; }
+
+        /* ============ RELATÓRIO ============ */
+        #area-relatorio-print { display: none; }
+    </style>
+</head>
+<body class="bg-gray-100 p-6" id="body-main">
+
+    <!-- DROP OVERLAY -->
+    <div id="drop-overlay">
+        <span style="font-size:3rem;">📂</span>
+        <span style="font-size:1.3rem; margin-top:10px;">Solte os PDFs aqui para importar</span>
+    </div>
+
+    <!-- NAV -->
+    <nav class="flex gap-4 mb-4 items-center">
+        <button onclick="alternarAba('distribuicao')" id="btn-distribuicao"
+            class="bg-indigo-900 text-white px-6 py-2 rounded shadow font-bold transition">
+            Distribuição de Caixa
+        </button>
+        <button onclick="alternarAba('conciliacao')" id="btn-conciliacao"
+            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded shadow font-bold transition">
+            Conciliação Diária (Rede Local)
+        </button>
+        <div class="ml-auto">
+            <button onclick="alternarModoEscuro()" id="btn-dark"
+                class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded shadow font-bold transition"
+                title="Alternar Modo Escuro">🌙</button>
+        </div>
+    </nav>
+
+    <!-- ============================================================ -->
+    <!-- ABA 1: DISTRIBUIÇÃO                                          -->
+    <!-- ============================================================ -->
+    <div id="aba-distribuicao">
+
+        <!-- HEADER -->
+        <header class="flex justify-between items-center bg-white p-4 rounded shadow mb-4 border-t-8 border-green-700">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">SmartPag</h1>
+                <p class="text-sm text-gray-500">Sistema Offline Seguro (Salva na sua Rede)</p>
+            </div>
+            <div class="flex gap-2 flex-wrap justify-end">
+                <button onclick="abrirModalRegras()"
+                    class="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded font-bold transition flex items-center gap-2 shadow"
+                    title="Configurar regras de banco automático">
+                    ⚙️ Regras de Banco
+                </button>
+                <button onclick="limparRascunhoManual()"
+                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded font-bold transition flex items-center gap-2 shadow">
+                    🧹 Limpar Tabela
+                </button>
+                <label class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-bold cursor-pointer transition flex items-center gap-2 shadow-lg">
+                    📥 Importar PDF(s)
+                    <input type="file" id="upload-pdf" accept=".pdf" class="hidden" multiple onchange="processarPDF(event)">
+                </label>
+                <button onclick="exportarExcel()"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded font-bold transition flex items-center gap-2 shadow">
+                    📊 Excel
+                </button>
+                <button onclick="gerarRelatorioPDF()"
+                    class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded font-bold transition flex items-center gap-2 shadow">
+                    📋 Relatório por Banco
+                </button>
+                <button onclick="salvarBancoLocal()" id="btn-salvar"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold transition flex items-center gap-2 shadow-lg">
+                    💾 Salvar Banco
+                    <span id="badge-pendentes" class="badge-pendente hidden">0</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- DASHBOARD -->
+        <main class="grid grid-cols-3 gap-4 mb-4">
+            <div class="bg-white p-4 rounded shadow text-center border-t-4 border-gray-300">
+                <p class="text-sm text-gray-500 font-bold">VALOR TOTAL NA TELA</p>
+                <p class="text-2xl text-blue-600 font-bold" id="dashboard-total">R$ 0,00</p>
+            </div>
+            <div class="bg-white p-4 rounded shadow text-center border-t-4 border-gray-300">
+                <p class="text-sm text-gray-500 font-bold">PAGAMENTOS NA TELA</p>
+                <p class="text-2xl text-gray-800 font-bold" id="dashboard-qtd">0</p>
+            </div>
+            <div class="bg-white p-4 rounded shadow text-center border-t-4 border-green-600 flex flex-col justify-center items-center">
+                <p class="text-sm text-gray-500 font-bold mb-1">DATA DE PAGAMENTO DO LOTE</p>
+                <input type="date" id="data-pagamento-global" onchange="salvarEstadoLocal()"
+                    class="border-2 border-green-600 rounded p-1 font-bold text-center text-gray-700 outline-none cursor-pointer bg-green-50">
+            </div>
+        </main>
+
+        <!-- FILTROS -->
+        <div class="bg-white p-3 rounded shadow mb-2 flex flex-wrap gap-2 items-center border-l-4 border-indigo-400">
+            <span class="font-bold text-gray-600 text-sm">🔍 Filtros:</span>
+            <input type="text" id="filtro-texto" placeholder="Fornecedor, Voucher ou Fatura..."
+                oninput="filtrarTabela()"
+                class="filtro-input flex-1 min-w-[200px]">
+            <select id="filtro-banco" onchange="filtrarTabela()" class="filtro-input">
+                <option value="">Todos os Bancos</option>
+                <option value="itau">Itaú</option>
+                <option value="santander">Santander</option>
+                <option value="bradesco">Bradesco</option>
+                <option value="caixa">Caixa</option>
+                <option value="brasil">Brasil</option>
+                <option value="__sem_banco">Sem Banco</option>
+            </select>
+            <select id="filtro-classificacao" onchange="filtrarTabela()" class="filtro-input">
+                <option value="">Todas as Classificações</option>
+                <option value="Fornecedores">Fornecedores</option>
+                <option value="Concessionária">Concessionária</option>
+                <option value="Tributo">Tributo</option>
+                <option value="Débito em Conta">Débito em Conta</option>
+                <option value="RH">RH</option>
+            </select>
+            <select id="filtro-tipodoc" onchange="filtrarTabela()" class="filtro-input">
+                <option value="">Todos os Tipos</option>
+                <option value="PP">PP</option>
+                <option value="PD">PD</option>
+                <option value="PS">PS</option>
+                <option value="PV">PV</option>
+                <option value="P4">P4</option>
+                <option value="P5">P5</option>
+                <option value="P8">P8</option>
+                <option value="NO">NO</option>
+                <option value="PH">PH</option>
+                <option value="PI">PI</option>
+            </select>
+            <button onclick="limparFiltros()"
+                class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm font-bold transition">
+                ✕ Limpar
+            </button>
+        </div>
+
+        <!-- TABELA -->
+        <section class="bg-white rounded shadow mb-6 border-t-4 border-indigo-900 overflow-hidden">
+            <div class="bg-indigo-900 text-white p-3 flex flex-wrap justify-between items-center font-bold gap-4">
+                <span class="text-lg">DISTRIBUIÇÃO DOS PAGAMENTOS</span>
+                <div class="flex gap-3">
+                    <button onclick="agruparSelecionados()"
+                        class="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded shadow transition flex items-center gap-2 border border-blue-400">
+                        🔗 Unir Selecionados
+                    </button>
+                    <button onclick="consolidarAutomatico()"
+                        class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded shadow transition flex items-center gap-2 border border-purple-500">
+                        🤖 Consolidar Automático
+                    </button>
+                    <button onclick="desagruparSelecionados()"
+                        class="bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded shadow transition border border-red-400">
+                        Desfazer União
+                    </button>
+                </div>
+            </div>
+
+            <div class="overflow-y-auto max-h-[50vh] overflow-x-auto relative">
+                <table class="w-full text-sm text-left border-collapse tabela-fixa">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+                        <tr>
+                            <th class="px-3 py-2 border bg-gray-200">Conf.</th>
+                            <th class="px-3 py-2 border bg-gray-200">Fornecedor</th>
+                            <th class="px-3 py-2 border bg-gray-200">Voucher</th>
+                            <th class="px-3 py-2 border bg-gray-200">Fatura / Histórico</th>
+                            <th class="px-3 py-2 border bg-gray-200">Vencimento</th>
+                            <th class="px-3 py-2 border bg-gray-200">Valor (R$)</th>
+                            <th class="px-3 py-2 border bg-gray-200">Cód. Benef.</th>
+                            <th class="px-3 py-2 border bg-gray-200">Tipo Doc.</th>
+                            <th class="px-3 py-2 border bg-gray-200">Cód. Forn.</th>
+                            <th class="px-3 py-2 border bg-gray-200">Classificação</th>
+                            <th class="px-3 py-2 border bg-gray-200">Banco</th>
+                            <th class="px-3 py-2 border bg-gray-200">Obs.</th>
+                            <th class="px-3 py-2 border bg-gray-200 text-center">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-pagamentos"></tbody>
+                    <tfoot id="tfoot-totais" class="bg-gray-50 font-bold border-t-2 border-gray-300"></tfoot>
+                </table>
+            </div>
+        </section>
+
+        <!-- FITAS -->
+        <section class="bg-indigo-900 p-4 rounded shadow mt-6">
+            <h2 class="text-sm font-bold text-white text-center mb-4 uppercase">Fita de Cálculo e Resumo de Grupos</h2>
+            <div class="grid grid-cols-5 gap-4">
+                <!-- ITAÚ -->
+                <div class="bg-white p-4 rounded shadow-inner flex flex-col items-center">
+                    <div id="titulo-itau" class="text-green-700 font-bold text-xs text-center border-b-2 border-green-700 w-full pb-1 mb-2">ITAÚ - 0 PAGAMENTOS</div>
+                    <div class="w-0 h-0 border-l-[15px] border-l-transparent border-t-[15px] border-t-green-500 border-r-[15px] border-r-transparent self-start mb-2"></div>
+                    <div class="font-mono text-right w-full text-gray-600 text-sm leading-relaxed">
+                        <span id="soma-itau">0,00 +<br></span>------------<br>
+                        <span class="text-xs">TOTAL</span><br>
+                        <span id="total-itau" class="text-black font-bold text-base">0,00 *</span>
+                    </div>
+                    <div id="detalhes-itau" class="detalhes-impressao mt-4 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
+                    <button onclick="imprimirFita('itau')" class="mt-4 bg-green-600 hover:bg-green-700 text-white w-full py-2 rounded text-xs font-bold transition">🖨️ IMPRIMIR ITAÚ</button>
+                </div>
+                <!-- SANTANDER -->
+                <div class="bg-white p-4 rounded shadow-inner flex flex-col items-center">
+                    <div id="titulo-santander" class="text-yellow-600 font-bold text-xs text-center border-b-2 border-yellow-600 w-full pb-1 mb-2">SANTANDER - 0 PAGAMENTOS</div>
+                    <div class="w-0 h-0 border-l-[15px] border-l-transparent border-t-[15px] border-t-[#ccff00] border-r-[15px] border-r-transparent self-start mb-2"></div>
+                    <div class="font-mono text-right w-full text-gray-600 text-sm leading-relaxed">
+                        <span id="soma-santander">0,00 +<br></span>------------<br>
+                        <span class="text-xs">TOTAL</span><br>
+                        <span id="total-santander" class="text-black font-bold text-base">0,00 *</span>
+                    </div>
+                    <div id="detalhes-santander" class="detalhes-impressao mt-4 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
+                    <button onclick="imprimirFita('santander')" class="mt-4 bg-[#ccff00] hover:bg-yellow-400 text-black w-full py-2 rounded text-xs font-bold transition">🖨️ IMPRIMIR SANTANDER</button>
+                </div>
+                <!-- BRADESCO -->
+                <div class="bg-white p-4 rounded shadow-inner flex flex-col items-center">
+                    <div id="titulo-bradesco" class="text-orange-600 font-bold text-xs text-center border-b-2 border-orange-600 w-full pb-1 mb-2">BRADESCO - 0 PAGAMENTOS</div>
+                    <div class="w-0 h-0 border-l-[15px] border-l-transparent border-t-[15px] border-t-orange-500 border-r-[15px] border-r-transparent self-start mb-2"></div>
+                    <div class="font-mono text-right w-full text-gray-600 text-sm leading-relaxed">
+                        <span id="soma-bradesco">0,00 +<br></span>------------<br>
+                        <span class="text-xs">TOTAL</span><br>
+                        <span id="total-bradesco" class="text-black font-bold text-base">0,00 *</span>
+                    </div>
+                    <div id="detalhes-bradesco" class="detalhes-impressao mt-4 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
+                    <button onclick="imprimirFita('bradesco')" class="mt-4 bg-orange-600 hover:bg-orange-700 text-white w-full py-2 rounded text-xs font-bold transition">🖨️ IMPRIMIR BRADESCO</button>
+                </div>
+                <!-- CAIXA -->
+                <div class="bg-white p-4 rounded shadow-inner flex flex-col items-center">
+                    <div id="titulo-caixa" class="text-blue-600 font-bold text-xs text-center border-b-2 border-blue-600 w-full pb-1 mb-2">CAIXA - 0 PAGAMENTOS</div>
+                    <div class="w-0 h-0 border-l-[15px] border-l-transparent border-t-[15px] border-t-blue-500 border-r-[15px] border-r-transparent self-start mb-2"></div>
+                    <div class="font-mono text-right w-full text-gray-600 text-sm leading-relaxed">
+                        <span id="soma-caixa">0,00 +<br></span>------------<br>
+                        <span class="text-xs">TOTAL</span><br>
+                        <span id="total-caixa" class="text-black font-bold text-base">0,00 *</span>
+                    </div>
+                    <div id="detalhes-caixa" class="detalhes-impressao mt-4 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
+                    <button onclick="imprimirFita('caixa')" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded text-xs font-bold transition">🖨️ IMPRIMIR CAIXA</button>
+                </div>
+                <!-- BRASIL -->
+                <div class="bg-white p-4 rounded shadow-inner flex flex-col items-center">
+                    <div id="titulo-brasil" class="text-pink-600 font-bold text-xs text-center border-b-2 border-pink-600 w-full pb-1 mb-2">BRASIL - 0 PAGAMENTOS</div>
+                    <div class="w-0 h-0 border-l-[15px] border-l-transparent border-t-[15px] border-t-pink-500 border-r-[15px] border-r-transparent self-start mb-2"></div>
+                    <div class="font-mono text-right w-full text-gray-600 text-sm leading-relaxed">
+                        <span id="soma-brasil">0,00 +<br></span>------------<br>
+                        <span class="text-xs">TOTAL</span><br>
+                        <span id="total-brasil" class="text-black font-bold text-base">0,00 *</span>
+                    </div>
+                    <div id="detalhes-brasil" class="detalhes-impressao mt-4 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
+                    <button onclick="imprimirFita('brasil')" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white w-full py-2 rounded text-xs font-bold transition">🖨️ IMPRIMIR BRASIL</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ABA 2: CONCILIAÇÃO                                           -->
+    <!-- ============================================================ -->
+    <div id="aba-conciliacao" class="hidden">
+        <header class="flex justify-between items-center bg-white p-4 rounded shadow mb-4 border-t-8 border-yellow-500 flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Conciliação de Pagamentos</h1>
+                <p class="text-sm text-gray-500">Importe o arquivo JSON salvo na rede para realizar as baixas</p>
+            </div>
+            <div class="flex gap-3 items-center flex-wrap">
+                <div class="flex items-center gap-2 bg-yellow-50 border border-yellow-300 rounded px-3 py-1">
+                    <span class="text-sm font-bold text-gray-600">👤 Responsável:</span>
+                    <input type="text" id="campo-responsavel" placeholder="Digite seu nome..."
+                        oninput="salvarResponsavel()"
+                        class="bg-transparent border-none outline-none text-sm font-semibold text-gray-700 min-w-[140px]">
+                </div>
+                <label class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded font-bold cursor-pointer transition flex items-center gap-2 shadow">
+                    📂 Carregar Arquivo da Rede
+                    <input type="file" id="upload-db" accept=".json" class="hidden" onchange="importarBancoLocal(event)">
+                </label>
+                <button onclick="salvarBancoAtualizado()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold transition flex items-center gap-2 shadow">
+                    💾 Baixar Arquivo Atualizado
+                </button>
+            </div>
+        </header>
+
+        <section class="bg-white rounded shadow border-t-4 border-yellow-600 overflow-hidden">
+            <div class="overflow-y-auto max-h-[65vh] overflow-x-auto relative">
+                <table class="w-full text-sm text-left border-collapse tabela-fixa">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+                        <tr>
+                            <th class="px-4 py-2 border bg-gray-200">Data Pagamento</th>
+                            <th class="px-4 py-2 border bg-gray-200">Fornecedor</th>
+                            <th class="px-4 py-2 border bg-gray-200">Voucher</th>
+                            <th class="px-4 py-2 border bg-gray-200">Vencimento</th>
+                            <th class="px-4 py-2 border bg-gray-200">Valor (R$)</th>
+                            <th class="px-4 py-2 border bg-gray-200">Obs.</th>
+                            <th class="px-4 py-2 border bg-gray-200">Banco</th>
+                            <th class="px-4 py-2 border bg-gray-200">Status</th>
+                            <th class="px-4 py-2 border bg-gray-200">Baixado por</th>
+                            <th class="px-4 py-2 border bg-gray-200 text-center">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-conciliacao">
+                        <tr><td colspan="10" class="text-center py-6 font-bold text-gray-500">Nenhum arquivo carregado. Clique em "Carregar Arquivo da Rede" para iniciar.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MODAL DE REGRAS                                              -->
+    <!-- ============================================================ -->
+    <div id="modal-regras" class="modal-overlay hidden" onclick="fecharModalFora(event)">
+        <div class="modal-box">
+            <div class="flex justify-between items-center mb-5 border-b pb-3">
+                <h2 class="text-xl font-bold text-indigo-900">⚙️ Regras de Banco Automático</h2>
+                <button onclick="fecharModalRegras()" class="text-gray-400 hover:text-red-600 text-3xl font-bold leading-none">×</button>
+            </div>
+
+            <!-- Por tipo de documento -->
+            <div class="mb-6">
+                <h3 class="font-bold text-gray-700 mb-1 text-sm uppercase tracking-wide">📄 Por Tipo de Documento</h3>
+                <p class="text-xs text-gray-500 mb-3">Ao importar PDF, se o tipo do documento coincidir, o banco é preenchido automaticamente.</p>
+                <div class="grid grid-cols-2 gap-2" id="regras-tipo-doc"></div>
+            </div>
+
+            <!-- Por código de fornecedor -->
+            <div class="mb-6">
+                <h3 class="font-bold text-gray-700 mb-1 text-sm uppercase tracking-wide">🏭 Por Código de Fornecedor</h3>
+                <p class="text-xs text-gray-500 mb-3">O banco do fornecedor tem prioridade sobre o tipo de documento.</p>
+                <div id="lista-regras-fornecedor" class="space-y-2 mb-3 max-h-48 overflow-y-auto pr-1"></div>
+                <button onclick="adicionarLinhaRegraFornecedor()"
+                    class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 px-3 py-1 rounded text-sm font-bold transition">
+                    + Adicionar Fornecedor
+                </button>
+            </div>
+
+            <div class="flex justify-end gap-3 border-t pt-4">
+                <button onclick="fecharModalRegras()"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded font-bold transition">Cancelar</button>
+                <button onclick="salvarRegras()"
+                    class="bg-indigo-700 hover:bg-indigo-800 text-white px-5 py-2 rounded font-bold transition">💾 Salvar Regras</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RELATÓRIO IMPRESSÃO -->
+    <div id="area-relatorio-print" class="area-relatorio-print"></div>
+
+    <!-- ============================================================ -->
+    <!-- SCRIPT                                                        -->
+    <!-- ============================================================ -->
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+        let contadorGrupo = 1;
+        let bancoDeDadosConciliacao = [];
+        let regrasBanco = { porTipo: {}, porFornecedor: {} };
+
+        const TIPOS_DOC   = ["PP", "PD", "PH", "PI", "PS", "PV", "NO", "P4", "P5", "P8"];
+        const BANCOS_NOMES = ['itau', 'santander', 'bradesco', 'caixa', 'brasil'];
+        const BANCOS_LABEL = { itau: 'Itaú', santander: 'Santander', bradesco: 'Bradesco', caixa: 'Caixa', brasil: 'Brasil' };
+        const BANCOS_COR   = { itau: '#15803d', santander: '#b45309', bradesco: '#c2410c', caixa: '#1d4ed8', brasil: '#be185d' };
+
+        const coresBancos = {
+            itau:      { linha: 'bg-green-50',  seletor: 'bg-green-600 text-white' },
+            santander: { linha: 'bg-yellow-50', seletor: 'bg-[#ccff00] text-black' },
+            bradesco:  { linha: 'bg-orange-50', seletor: 'bg-orange-600 text-white' },
+            caixa:     { linha: 'bg-blue-50',   seletor: 'bg-blue-600 text-white'  },
+            brasil:    { linha: 'bg-pink-50',   seletor: 'bg-pink-500 text-white'  }
+        };
+
+        // ==========================================
+        // DARK MODE
+        // ==========================================
+        function alternarModoEscuro() {
+            const body = document.getElementById('body-main');
+            const btn  = document.getElementById('btn-dark');
+            body.classList.toggle('dark-mode');
+            const dark = body.classList.contains('dark-mode');
+            btn.textContent = dark ? '☀️' : '🌙';
+            localStorage.setItem('smartpag_darkmode', dark ? '1' : '0');
+        }
+
+        function aplicarModoEscuroSalvo() {
+            if (localStorage.getItem('smartpag_darkmode') === '1') {
+                document.getElementById('body-main').classList.add('dark-mode');
+                document.getElementById('btn-dark').textContent = '☀️';
+            }
+        }
+
+        // ==========================================
+        // DRAG & DROP
+        // ==========================================
+        let dragCounter = 0;
+        document.addEventListener('dragenter', (e) => {
+            if (e.dataTransfer.types.includes('Files')) {
+                dragCounter++;
+                document.getElementById('drop-overlay').classList.add('ativo');
+            }
+        });
+        document.addEventListener('dragleave', () => {
+            dragCounter--;
+            if (dragCounter <= 0) {
+                dragCounter = 0;
+                document.getElementById('drop-overlay').classList.remove('ativo');
+            }
+        });
+        document.addEventListener('dragover', (e) => e.preventDefault());
+        document.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragCounter = 0;
+            document.getElementById('drop-overlay').classList.remove('ativo');
+            const arquivos = Array.from(e.dataTransfer.files).filter(f => f.name.toLowerCase().endsWith('.pdf'));
+            if (arquivos.length > 0) processarArquivosPDF(arquivos);
+            else alert('Apenas arquivos PDF são aceitos.');
+        });
+
+        // ==========================================
+        // REGRAS DE BANCO
+        // ==========================================
+        function carregarRegras() {
+            const salvas = localStorage.getItem('smartpag_regras');
+            if (salvas) { try { regrasBanco = JSON.parse(salvas); } catch(e) {} }
+            if (!regrasBanco.porTipo)      regrasBanco.porTipo = {};
+            if (!regrasBanco.porFornecedor) regrasBanco.porFornecedor = {};
+        }
+
+        function salvarRegras() {
+            TIPOS_DOC.forEach(tp => {
+                const sel = document.getElementById('regra-tp-' + tp);
+                if (sel) regrasBanco.porTipo[tp] = sel.value;
+            });
+            regrasBanco.porFornecedor = {};
+            document.querySelectorAll('.regra-forn-row').forEach(row => {
+                const cod   = row.querySelector('.regra-forn-cod').value.trim();
+                const banco = row.querySelector('.regra-forn-banco').value;
+                if (cod && banco) regrasBanco.porFornecedor[cod] = banco;
+            });
+            localStorage.setItem('smartpag_regras', JSON.stringify(regrasBanco));
+            fecharModalRegras();
+            alert('✅ Regras salvas com sucesso!');
+        }
+
+        function aplicarRegra(tp, codFornecedor) {
+            if (codFornecedor && regrasBanco.porFornecedor[codFornecedor])
+                return regrasBanco.porFornecedor[codFornecedor];
+            if (tp && regrasBanco.porTipo[tp])
+                return regrasBanco.porTipo[tp];
+            return '';
+        }
+
+        function abrirModalRegras() {
+            renderizarModalRegras();
+            document.getElementById('modal-regras').classList.remove('hidden');
+        }
+
+        function fecharModalRegras() {
+            document.getElementById('modal-regras').classList.add('hidden');
+        }
+
+        function fecharModalFora(event) {
+            if (event.target === document.getElementById('modal-regras')) fecharModalRegras();
+        }
+
+        function renderizarModalRegras() {
+            const bancosOpts = `
+                <option value="">-- Sem Regra --</option>
+                <option value="itau">Itaú</option>
+                <option value="santander">Santander</option>
+                <option value="bradesco">Bradesco</option>
+                <option value="caixa">Caixa</option>
+                <option value="brasil">Brasil</option>`;
+
+            document.getElementById('regras-tipo-doc').innerHTML = TIPOS_DOC.map(tp => `
+                <div class="regra-tp flex items-center gap-2 bg-gray-50 p-2 rounded border">
+                    <span class="font-mono font-bold text-indigo-700 w-8 text-center text-sm">${tp}</span>
+                    <select id="regra-tp-${tp}" class="border rounded p-1 text-sm flex-1 outline-none">
+                        ${bancosOpts}
+                    </select>
+                </div>`).join('');
+
+            TIPOS_DOC.forEach(tp => {
+                const sel = document.getElementById('regra-tp-' + tp);
+                if (sel && regrasBanco.porTipo[tp]) sel.value = regrasBanco.porTipo[tp];
+            });
+
+            const lista = document.getElementById('lista-regras-fornecedor');
+            lista.innerHTML = '';
+            Object.entries(regrasBanco.porFornecedor).forEach(([cod, banco]) =>
+                adicionarLinhaRegraFornecedor(cod, banco));
+        }
+
+        function adicionarLinhaRegraFornecedor(cod = '', banco = '') {
+            const lista = document.getElementById('lista-regras-fornecedor');
+            const div = document.createElement('div');
+            div.className = 'regra-forn-row flex items-center gap-2';
+            div.innerHTML = `
+                <input type="text" placeholder="Cód. Fornecedor" class="regra-forn-cod border rounded p-1 text-sm w-36 outline-none" value="${cod}">
+                <span class="text-gray-400 font-bold">→</span>
+                <select class="regra-forn-banco border rounded p-1 text-sm flex-1 outline-none">
+                    <option value="">-- Banco --</option>
+                    <option value="itau"      ${banco==='itau'?'selected':''}>Itaú</option>
+                    <option value="santander" ${banco==='santander'?'selected':''}>Santander</option>
+                    <option value="bradesco"  ${banco==='bradesco'?'selected':''}>Bradesco</option>
+                    <option value="caixa"     ${banco==='caixa'?'selected':''}>Caixa</option>
+                    <option value="brasil"    ${banco==='brasil'?'selected':''}>Brasil</option>
+                </select>
+                <button onclick="this.closest('.regra-forn-row').remove()"
+                    class="text-red-400 hover:text-red-600 font-bold text-xl leading-none">×</button>`;
+            lista.appendChild(div);
+        }
+
+        // ==========================================
+        // FILTROS
+        // ==========================================
+        function filtrarTabela() {
+            const texto  = document.getElementById('filtro-texto').value.toLowerCase();
+            const banco  = document.getElementById('filtro-banco').value;
+            const classif = document.getElementById('filtro-classificacao').value;
+            const tipoDoc = document.getElementById('filtro-tipodoc').value;
+
+            document.querySelectorAll('#tabela-pagamentos tr').forEach(linha => {
+                const colunas = linha.querySelectorAll('td');
+                if (colunas.length === 0) { linha.style.display = ''; return; }
+
+                const fornecedor  = (colunas[1]?.innerText || '').toLowerCase();
+                const voucher     = (colunas[2]?.innerText || '').toLowerCase();
+                const fatura      = (colunas[3]?.innerText || '').toLowerCase();
+                const tipoDocLinha = (colunas[7]?.innerText || '').trim();
+                const bancoLinha  = linha.querySelector('.select-banco')?.value || '';
+                const classifLinha = linha.querySelector('.select-classificacao')?.value || '';
+
+                const matchTexto  = !texto   || fornecedor.includes(texto) || voucher.includes(texto) || fatura.includes(texto);
+                const matchBanco  = !banco   || (banco === '__sem_banco' ? bancoLinha === '' : bancoLinha === banco);
+                const matchClassif = !classif || classifLinha === classif;
+                const matchTipo   = !tipoDoc  || tipoDocLinha === tipoDoc;
+
+                linha.style.display = (matchTexto && matchBanco && matchClassif && matchTipo) ? '' : 'none';
+            });
+        }
+
+        function limparFiltros() {
+            ['filtro-texto','filtro-banco','filtro-classificacao','filtro-tipodoc']
+                .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            filtrarTabela();
+        }
+
+        // ==========================================
+        // AUDITORIA — RESPONSÁVEL
+        // ==========================================
+        function salvarResponsavel() {
+            localStorage.setItem('smartpag_responsavel', document.getElementById('campo-responsavel').value);
+        }
+
+        function carregarResponsavel() {
+            const el = document.getElementById('campo-responsavel');
+            if (el) el.value = localStorage.getItem('smartpag_responsavel') || '';
+        }
+
+        // ==========================================
+        // RASCUNHO (LOCAL STORAGE)
+        // ==========================================
+        function salvarEstadoLocal() {
+            const linhas = document.querySelectorAll('#tabela-pagamentos tr');
+            let dadosSalvos = [];
+            linhas.forEach(linha => {
+                const colunas = linha.querySelectorAll('td');
+                if (colunas.length === 0) return;
+                dadosSalvos.push({
+                    fornecedorHTML:  colunas[1].innerHTML,
+                    voucher:         colunas[2].innerText,
+                    fatura:          colunas[3].innerText,
+                    vencimento:      colunas[4].innerText,
+                    valor:           linha.querySelector('.valor-texto').innerText,
+                    codBeneficiario: colunas[6]?.innerText || '-',
+                    tipoDocumento:   colunas[7]?.innerText || '-',
+                    codFornecedor:   colunas[8]?.innerText || '-',
+                    classificacao:   linha.querySelector('.select-classificacao').value,
+                    banco:           linha.querySelector('.select-banco').value,
+                    observacao:      linha.querySelector('.obs-input')?.value || '',
+                    grupoId:         linha.getAttribute('data-grupo') || null
+                });
+            });
+            localStorage.setItem('smartpag_data_pagamento', document.getElementById('data-pagamento-global').value);
+            localStorage.setItem('smartpag_tabela', JSON.stringify(dadosSalvos));
+            localStorage.setItem('smartpag_contador', contadorGrupo);
+        }
+
+        function carregarEstadoLocal() {
+            const dataPag = localStorage.getItem('smartpag_data_pagamento');
+            document.getElementById('data-pagamento-global').value =
+                dataPag || new Date().toISOString().split('T')[0];
+
+            const contadorStr = localStorage.getItem('smartpag_contador');
+            if (contadorStr) contadorGrupo = parseInt(contadorStr);
+
+            const dadosStr = localStorage.getItem('smartpag_tabela');
+            if (!dadosStr) return;
+
+            const dadosSalvos = JSON.parse(dadosStr);
+            const tbody = document.getElementById('tabela-pagamentos');
+            tbody.innerHTML = '';
+
+            dadosSalvos.forEach(dado => {
+                const novaTr = criarLinhaTR(
+                    dado.fornecedorHTML, dado.voucher, dado.fatura, dado.vencimento,
+                    dado.valor, dado.codBeneficiario, dado.tipoDocumento, dado.codFornecedor,
+                    dado.observacao || ''
+                );
+                if (dado.grupoId) novaTr.setAttribute('data-grupo', dado.grupoId);
+                tbody.appendChild(novaTr);
+
+                const sel = novaTr.querySelector('.select-banco');
+                sel.value = dado.banco;
+                novaTr.querySelector('.select-classificacao').value = dado.classificacao;
+                atualizarCorDaLinha(sel, false);
+                sel.addEventListener('change', function() { atualizarCorDaLinha(this); });
+                novaTr.querySelector('.obs-input').addEventListener('change', salvarEstadoLocal);
+            });
+        }
+
+        function limparRascunhoManual() {
+            if (confirm("Tem certeza que deseja apagar a tabela e limpar a memória?")) {
+                document.getElementById('tabela-pagamentos').innerHTML = '';
+                localStorage.removeItem('smartpag_tabela');
+                localStorage.removeItem('smartpag_contador');
+                contadorGrupo = 1;
+                calcularTotais();
+            }
+        }
+
+        // ==========================================
+        // EXPORTAÇÃO E IMPORTAÇÃO JSON
+        // ==========================================
+        function salvarBancoLocal() {
+            const todasLinhas = Array.from(document.querySelectorAll('#tabela-pagamentos tr'));
+            if (todasLinhas.length === 0) { alert("Não há pagamentos na tela para salvar."); return; }
+
+            const dataPagamentoRaw = document.getElementById('data-pagamento-global').value;
+            if (!dataPagamentoRaw) { alert("Por favor, selecione a Data de Pagamento do Lote."); return; }
+            const p = dataPagamentoRaw.split('-');
+            const dataPagamentoFormatada = `${p[2]}/${p[1]}/${p[0]}`;
+
+            const linhasComBanco  = todasLinhas.filter(l => l.querySelector('.select-banco')?.value);
+            const linhasSemBanco  = todasLinhas.filter(l => !l.querySelector('.select-banco')?.value);
+
+            if (linhasComBanco.length === 0) { alert("Nenhum pagamento com Banco selecionado para salvar."); return; }
+
+            if (linhasSemBanco.length > 0) {
+                const ok = confirm(`⚠️ ${linhasSemBanco.length} linha(s) sem banco serão ignoradas.\nDeseja continuar salvando as ${linhasComBanco.length} linha(s) com banco?`);
+                if (!ok) return;
+            }
+
+            const dataArquivo = new Date().toISOString().split('T')[0];
+            const pacotes = linhasComBanco.map(linha => {
+                const colunas = linha.querySelectorAll('td');
+                return {
+                    fornecedor:      colunas[1].innerText.replace('🔗 ','').replace('↳ ',''),
+                    voucher:         colunas[2].innerText,
+                    fatura:          colunas[3].innerText,
+                    vencimento:      colunas[4].innerText,
+                    valor:           linha.querySelector('.valor-texto').innerText,
+                    classificacao:   linha.querySelector('.select-classificacao').value,
+                    bancoSelecionado: linha.querySelector('.select-banco').value,
+                    observacao:      linha.querySelector('.obs-input')?.value || '',
+                    status:          "Pendente",
+                    dataPagamento:   dataPagamentoFormatada
+                };
+            });
+
+            const blob = new Blob([JSON.stringify(pacotes, null, 2)], { type: "application/json" });
+            const url  = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `SmartPag_Exportacao_${dataArquivo}.json`;
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+
+            linhasComBanco.forEach(l => l.remove());
+            localStorage.removeItem('smartpag_tabela');
+            localStorage.removeItem('smartpag_contador');
+            calcularTotais();
+            alert(`${pacotes.length} pagamentos exportados com data de pagamento ${dataPagamentoFormatada}.\nSalve o arquivo na rede!`);
+        }
+
+        function importarBancoLocal(evento) {
+            const arquivo = evento.target.files[0];
+            if (!arquivo) return;
+            const leitor = new FileReader();
+            leitor.onload = function(e) {
+                try {
+                    bancoDeDadosConciliacao = JSON.parse(e.target.result);
+                    renderizarConciliacao();
+                    alert("Arquivo importado com sucesso!");
+                } catch(err) {
+                    alert("Erro ao ler o arquivo. Certifique-se de que é um JSON válido do SmartPag.");
+                }
+                evento.target.value = '';
+            };
+            leitor.readAsText(arquivo);
+        }
+
+        function renderizarConciliacao() {
+            const tbody = document.getElementById('tabela-conciliacao');
+            tbody.innerHTML = '';
+            let temPendentes = false;
+
+            bancoDeDadosConciliacao.forEach((dados, index) => {
+                const tr = document.createElement('tr');
+                if (dados.status === "Pendente") {
+                    temPendentes = true;
+                    tr.className = "border-b hover:bg-gray-50 transition-colors";
+                    tr.innerHTML = `
+                        <td class="px-4 py-2 border font-bold text-green-700">${dados.dataPagamento || '-'}</td>
+                        <td class="px-4 py-2 border font-bold">${dados.fornecedor}</td>
+                        <td class="px-4 py-2 border">${dados.voucher}</td>
+                        <td class="px-4 py-2 border">${dados.vencimento || '-'}</td>
+                        <td class="px-4 py-2 border font-mono text-right">${dados.valor}</td>
+                        <td class="px-4 py-2 border text-xs text-gray-500 italic">${dados.observacao || '-'}</td>
+                        <td class="px-4 py-2 border uppercase font-medium">${dados.bancoSelecionado}</td>
+                        <td class="px-4 py-2 border text-red-600 font-bold">⏳ Pendente</td>
+                        <td class="px-4 py-2 border text-gray-400 text-xs">—</td>
+                        <td class="px-4 py-2 border text-center">
+                            <button onclick="darBaixaConciliacao(${index})"
+                                class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs font-bold transition">
+                                ✔️ Dar Baixa
+                            </button>
+                        </td>`;
+                } else {
+                    tr.className = "border-b bg-green-50 opacity-75";
+                    tr.innerHTML = `
+                        <td class="px-4 py-2 border text-gray-500">${dados.dataPagamento || '-'}</td>
+                        <td class="px-4 py-2 border text-gray-500">${dados.fornecedor}</td>
+                        <td class="px-4 py-2 border text-gray-500">${dados.voucher}</td>
+                        <td class="px-4 py-2 border text-gray-500">${dados.vencimento || '-'}</td>
+                        <td class="px-4 py-2 border font-mono text-right text-gray-500">${dados.valor}</td>
+                        <td class="px-4 py-2 border text-xs text-gray-400 italic">${dados.observacao || '-'}</td>
+                        <td class="px-4 py-2 border uppercase text-gray-500">${dados.bancoSelecionado}</td>
+                        <td class="px-4 py-2 border text-green-700 font-bold">✅ Conciliado</td>
+                        <td class="px-4 py-2 border text-xs text-gray-600">
+                            <span class="font-semibold">${dados.responsavelBaixa || '-'}</span><br>
+                            <span class="text-gray-400">${dados.dataBaixa || ''}</span>
+                        </td>
+                        <td class="px-4 py-2 border text-center text-gray-300 text-lg">—</td>`;
+                }
+                tbody.appendChild(tr);
+            });
+
+            if (!temPendentes) {
+                tbody.innerHTML += `<tr><td colspan="10" class="text-center py-6 font-bold text-green-600">🎉 Todos os pagamentos conciliados!</td></tr>`;
+            }
+        }
+
+        function darBaixaConciliacao(index) {
+            const responsavel = localStorage.getItem('smartpag_responsavel') || 'Não identificado';
+            bancoDeDadosConciliacao[index].status           = "Conciliado";
+            bancoDeDadosConciliacao[index].responsavelBaixa = responsavel;
+            bancoDeDadosConciliacao[index].dataBaixa        = new Date().toLocaleString('pt-BR');
+            renderizarConciliacao();
+        }
+
+        function salvarBancoAtualizado() {
+            if (bancoDeDadosConciliacao.length === 0) { alert("Nenhum dado importado para salvar."); return; }
+            const dataArquivo = new Date().toISOString().split('T')[0];
+            const blob = new Blob([JSON.stringify(bancoDeDadosConciliacao, null, 2)], { type: "application/json" });
+            const url  = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `SmartPag_Atualizado_${dataArquivo}.json`;
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+            alert("Arquivo atualizado gerado! Substitua o antigo na rede.");
+        }
+
+        // ==========================================
+        // EXCEL
+        // ==========================================
+        function exportarExcel() {
+            const linhas = document.querySelectorAll('#tabela-pagamentos tr');
+            if (linhas.length === 0) { alert("Não há dados para exportar."); return; }
+
+            const dados = [['Fornecedor','Voucher','Fatura / Histórico','Vencimento','Valor (R$)',
+                'Cód. Benef.','Tipo Doc.','Cód. Forn.','Classificação','Banco','Obs.']];
+
+            linhas.forEach(linha => {
+                if (linha.style.display === 'none') return;
+                const colunas = linha.querySelectorAll('td');
+                if (colunas.length === 0) return;
+                dados.push([
+                    colunas[1]?.innerText.replace('🔗 ','').replace('↳ ','') || '',
+                    colunas[2]?.innerText || '',
+                    colunas[3]?.innerText || '',
+                    colunas[4]?.innerText || '',
+                    linha.querySelector('.valor-texto')?.innerText || '',
+                    colunas[6]?.innerText || '',
+                    colunas[7]?.innerText || '',
+                    colunas[8]?.innerText || '',
+                    linha.querySelector('.select-classificacao')?.value || '',
+                    BANCOS_LABEL[linha.querySelector('.select-banco')?.value] || '',
+                    linha.querySelector('.obs-input')?.value || ''
+                ]);
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(dados);
+            ws['!cols'] = [
+                {wch:30},{wch:12},{wch:30},{wch:12},{wch:14},
+                {wch:12},{wch:8},{wch:12},{wch:16},{wch:12},{wch:24}
+            ];
+            XLSX.utils.book_append_sheet(wb, ws, "Pagamentos");
+            XLSX.writeFile(wb, `SmartPag_${new Date().toISOString().split('T')[0]}.xlsx`);
+        }
+
+        // ==========================================
+        // RELATÓRIO PDF POR BANCO
+        // ==========================================
+        function gerarRelatorioPDF() {
+            const linhas = document.querySelectorAll('#tabela-pagamentos tr');
+            if (linhas.length === 0) { alert("Não há dados para gerar relatório."); return; }
+
+            const dataPagamentoRaw = document.getElementById('data-pagamento-global').value;
+            let dataPagamentoFormatada = 'Não definida';
+            if (dataPagamentoRaw) {
+                const parts = dataPagamentoRaw.split('-');
+                dataPagamentoFormatada = `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+
+            // Calcula soma dos grupos
+            let somaGrupos = {};
+            linhas.forEach(linha => {
+                const grupoId = linha.getAttribute('data-grupo');
+                if (grupoId) {
+                    const val = textoParaNumero(linha.querySelector('.valor-texto').innerText);
+                    if (!somaGrupos[grupoId]) somaGrupos[grupoId] = { valor: 0 };
+                    somaGrupos[grupoId].valor += val;
+                }
+            });
+
+            // Agrega por banco → classificação
+            let dadosBancos = {};
+            BANCOS_NOMES.forEach(b => dadosBancos[b] = { classificacoes: {}, total: 0, qtd: 0 });
+            let gruposProcessados = {};
+
+            linhas.forEach(linha => {
+                if (linha.style.display === 'none') return;
+                const banco  = linha.querySelector('.select-banco')?.value;
+                if (!banco || !dadosBancos[banco]) return;
+                const grupoId = linha.getAttribute('data-grupo');
+                const classif = linha.querySelector('.select-classificacao').value;
+                const valor   = textoParaNumero(linha.querySelector('.valor-texto').innerText);
+
+                if (!dadosBancos[banco].classificacoes[classif])
+                    dadosBancos[banco].classificacoes[classif] = { total: 0, qtd: 0 };
+
+                if (grupoId) {
+                    if (!gruposProcessados[grupoId]) {
+                        const vg = somaGrupos[grupoId].valor;
+                        dadosBancos[banco].classificacoes[classif].total += vg;
+                        dadosBancos[banco].classificacoes[classif].qtd   += 1;
+                        dadosBancos[banco].total += vg;
+                        dadosBancos[banco].qtd   += 1;
+                        gruposProcessados[grupoId] = true;
+                    }
+                } else {
+                    dadosBancos[banco].classificacoes[classif].total += valor;
+                    dadosBancos[banco].classificacoes[classif].qtd   += 1;
+                    dadosBancos[banco].total += valor;
+                    dadosBancos[banco].qtd   += 1;
+                }
+            });
+
+            let totalGeral = 0, qtdGeral = 0;
+            let html = `
+            <div style="font-family:Arial,sans-serif; padding:24px; max-width:720px; margin:0 auto;">
+                <div style="text-align:center; border-bottom:3px solid #312e81; padding-bottom:14px; margin-bottom:22px;">
+                    <h1 style="font-size:20px; font-weight:bold; color:#312e81; margin:0;">SmartPag — Relatório Resumo por Banco</h1>
+                    <p style="font-size:12px; color:#6b7280; margin-top:5px;">
+                        Data de Pagamento: <strong>${dataPagamentoFormatada}</strong>
+                        &nbsp;|&nbsp; Gerado em: <strong>${new Date().toLocaleString('pt-BR')}</strong>
+                    </p>
+                </div>`;
+
+            BANCOS_NOMES.forEach(banco => {
+                const d = dadosBancos[banco];
+                if (d.qtd === 0) return;
+                totalGeral += d.total;
+                qtdGeral   += d.qtd;
+
+                html += `
+                <div style="margin-bottom:18px; border:1px solid #e5e7eb; border-radius:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                    <div style="background:${BANCOS_COR[banco]}; color:white; padding:10px 18px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:15px; font-weight:bold;">🏦 ${BANCOS_LABEL[banco].toUpperCase()}</span>
+                        <span style="font-size:12px; opacity:0.9;">${d.qtd} pagamento(s)</span>
+                    </div>
+                    <table style="width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:#f9fafb; font-size:11px; text-transform:uppercase; color:#9ca3af;">
+                                <th style="padding:6px 14px; text-align:left; border-bottom:1px solid #f3f4f6;">Classificação</th>
+                                <th style="padding:6px 14px; text-align:right; border-bottom:1px solid #f3f4f6;">Valor (R$)</th>
+                                <th style="padding:6px 14px; text-align:center; border-bottom:1px solid #f3f4f6;">Qtd.</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                Object.entries(d.classificacoes).forEach(([classif, info]) => {
+                    html += `
+                            <tr>
+                                <td style="padding:8px 14px; border-bottom:1px solid #f3f4f6; font-size:13px;">${classif}</td>
+                                <td style="padding:8px 14px; text-align:right; border-bottom:1px solid #f3f4f6; font-family:monospace; font-size:13px;">${formatarMoeda(info.total)}</td>
+                                <td style="padding:8px 14px; text-align:center; border-bottom:1px solid #f3f4f6; color:#9ca3af; font-size:12px;">(${info.qtd})</td>
+                            </tr>`;
+                });
+
+                html += `
+                        </tbody>
+                        <tfoot>
+                            <tr style="background:#f3f4f6; font-weight:bold;">
+                                <td style="padding:9px 14px; font-size:13px;">TOTAL ${BANCOS_LABEL[banco].toUpperCase()}</td>
+                                <td style="padding:9px 14px; text-align:right; font-family:monospace; font-size:14px; color:${BANCOS_COR[banco]};">${formatarMoeda(d.total)}</td>
+                                <td style="padding:9px 14px; text-align:center; color:#6b7280; font-size:12px;">(${d.qtd})</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>`;
+            });
+
+            html += `
+                <div style="background:#312e81; color:white; border-radius:10px; padding:14px 20px;
+                    display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                    <span style="font-size:15px; font-weight:bold;">💰 TOTAL GERAL</span>
+                    <span style="font-size:17px; font-weight:bold; font-family:monospace;">
+                        R$ ${formatarMoeda(totalGeral)} &nbsp;(${qtdGeral} pagamentos)
+                    </span>
+                </div>
+            </div>`;
+
+            const area = document.getElementById('area-relatorio-print');
+            area.innerHTML = html;
+            area.style.display = 'block';
+
+            const outros = Array.from(document.body.children).filter(el => el !== area);
+            outros.forEach(el => el.style.setProperty('display', 'none', 'important'));
+            window.print();
+            area.style.display = 'none';
+            outros.forEach(el => el.style.removeProperty('display'));
+        }
+
+        // ==========================================
+        // TABELA — OPERAÇÕES
+        // ==========================================
+        function textoParaNumero(texto) {
+            if (!texto) return 0;
+            let limpo = texto.replace(/\./g, '').replace(',', '.').replace('-', '');
+            let num = parseFloat(limpo) || 0;
+            if (texto.includes('-')) num = -num;
+            return num;
+        }
+
+        function formatarMoeda(valor) {
+            return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function editarValor(botao) {
+            const spanTexto = botao.previousElementSibling;
+            const novoValor = prompt("Digite o novo valor (Ex: 1.500,00):", spanTexto.innerText);
+            if (novoValor !== null && novoValor.trim() !== "") {
+                spanTexto.innerText = novoValor;
+                calcularTotais();
+            }
+        }
+
+        function excluirPagamento(botao) {
+            if (confirm("Tem certeza que deseja excluir este pagamento?")) {
+                botao.closest('tr').remove();
+                calcularTotais();
+            }
+        }
+
+        function criarLinhaTR(fornecedorHTML, voucher, fatura, vencimento, valor,
+                               codBeneficiario, tipoDocumento, codFornecedor, observacao) {
+            const obs = (observacao || '').replace(/"/g, '&quot;');
+            const novaTr = document.createElement('tr');
+            novaTr.className = 'border-b hover:bg-gray-100 transition-colors duration-300';
+            novaTr.innerHTML = `
+                <td class="px-3 py-2 border text-center"><input type="checkbox" class="w-4 h-4 text-green-600 cursor-pointer"></td>
+                <td class="px-3 py-2 border font-bold">${fornecedorHTML}</td>
+                <td class="px-3 py-2 border">${voucher}</td>
+                <td class="px-3 py-2 border">${fatura}</td>
+                <td class="px-3 py-2 border">${vencimento}</td>
+                <td class="px-3 py-2 border font-mono text-right flex justify-end items-center gap-2">
+                    <span class="valor-texto">${valor}</span>
+                    <button onclick="editarValor(this)" class="text-gray-400 hover:text-blue-600 cursor-pointer text-base" title="Alterar Valor">✏️</button>
+                </td>
+                <td class="px-3 py-2 border text-center">${codBeneficiario || '-'}</td>
+                <td class="px-3 py-2 border text-center">${tipoDocumento || '-'}</td>
+                <td class="px-3 py-2 border text-center">${codFornecedor || '-'}</td>
+                <td class="px-3 py-2 border">
+                    <select class="select-classificacao rounded p-1 w-full text-center font-bold text-gray-700 bg-gray-100 outline-none cursor-pointer transition-colors duration-300" onchange="propagarClassificacao(this)">
+                        <option value="Fornecedores">Fornecedores</option>
+                        <option value="Concessionária">Concessionária</option>
+                        <option value="Tributo">Tributo</option>
+                        <option value="Débito em Conta">Débito em Conta</option>
+                        <option value="RH">RH</option>
+                    </select>
+                </td>
+                <td class="px-3 py-2 border">
+                    <select class="select-banco rounded p-1 w-full text-center font-bold outline-none cursor-pointer transition-colors duration-300">
+                        <option value="">Selecione</option>
+                        <option value="itau">Itaú</option>
+                        <option value="santander">Santander</option>
+                        <option value="bradesco">Bradesco</option>
+                        <option value="caixa">Caixa</option>
+                        <option value="brasil">Brasil</option>
+                    </select>
+                </td>
+                <td class="px-3 py-2 border">
+                    <input type="text" class="obs-input" placeholder="Observação..." value="${obs}">
+                </td>
+                <td class="px-3 py-2 border text-center">
+                    <button onclick="excluirPagamento(this)" class="text-red-400 hover:text-red-700 cursor-pointer text-lg" title="Excluir">🗑️</button>
+                </td>`;
+            return novaTr;
+        }
+
+        function pagamentoJaExiste(voucher, valor) {
+            const v = voucher.trim(), vl = valor.trim();
+            for (let linha of document.querySelectorAll('#tabela-pagamentos tr')) {
+                const cv = linha.querySelectorAll('td')[2];
+                const cval = linha.querySelector('.valor-texto');
+                if (cv && cval && cv.innerText.trim() === v && cval.innerText.trim() === vl) return true;
+            }
+            return false;
+        }
+
+        function adicionarLinhaTabela(fornecedor, voucher, fatura, vencimento, valor, codBeneficiario, tipoDocumento, codFornecedor) {
+            if (pagamentoJaExiste(voucher, valor)) return false;
+
+            const tbody = document.getElementById('tabela-pagamentos');
+            const novaTr = criarLinhaTR(fornecedor, voucher, fatura, vencimento, valor,
+                                         codBeneficiario, tipoDocumento, codFornecedor, '');
+            tbody.appendChild(novaTr);
+
+            const sel = novaTr.querySelector('.select-banco');
+            const bancoAuto = aplicarRegra(tipoDocumento, codFornecedor);
+            if (bancoAuto) sel.value = bancoAuto;
+
+            atualizarCorDaLinha(sel, false);
+            sel.addEventListener('change', function() { atualizarCorDaLinha(this); });
+            novaTr.querySelector('.obs-input').addEventListener('change', salvarEstadoLocal);
+            return true;
+        }
+
+        // ==========================================
+        // AGRUPAMENTO
+        // ==========================================
+        function agruparSelecionados() {
+            const checkboxes = document.querySelectorAll('#tabela-pagamentos input[type="checkbox"]:checked');
+            if (checkboxes.length < 2) { alert("Selecione pelo menos 2 pagamentos para uni-los."); return; }
+            const grupoId = 'grupo-' + contadorGrupo++;
+            const primeiraLinha = checkboxes[0].closest('tr');
+            const bancoPadrao = primeiraLinha.querySelector('.select-banco').value;
+            const classifPadrao = primeiraLinha.querySelector('.select-classificacao').value;
+
+            checkboxes.forEach(cb => {
+                const linha = cb.closest('tr');
+                linha.setAttribute('data-grupo', grupoId);
+                const sel = linha.querySelector('.select-banco');
+                sel.value = bancoPadrao;
+                linha.querySelector('.select-classificacao').value = classifPadrao;
+                atualizarCorDaLinha(sel, false);
+                const cf = linha.querySelectorAll('td')[1];
+                if (!cf.innerHTML.includes('🔗')) cf.innerHTML = `🔗 ${cf.innerHTML}`;
+                cb.checked = false;
+            });
+            calcularTotais();
+        }
+
+        function consolidarAutomatico() {
+            const regexTributo = /(INSS|PCCL|PCC|ISS|IR)\s*$/i;
+            const linhas = Array.from(document.querySelectorAll('#tabela-pagamentos tr'));
+            const grupos = {};
+
+            linhas.forEach(linha => {
+                if (linha.hasAttribute('data-grupo')) return;
+                const cel = linha.querySelectorAll('td');
+                if (cel.length < 9) return;
+                const voucher = cel[2].innerText.trim();
+                const fatura  = cel[3].innerText.trim();
+                const codBenef = cel[6].innerText.trim();
+                if (!voucher || !codBenef || codBenef === '-') return;
+
+                const chave = voucher + '|' + codBenef;
+                if (!grupos[chave]) grupos[chave] = { nota: null, tributos: [] };
+
+                if (regexTributo.test(fatura)) grupos[chave].tributos.push(linha);
+                else if (!grupos[chave].nota)  grupos[chave].nota = linha;
+                else                           grupos[chave].tributos.push(linha);
+            });
+
+            let total = 0;
+            Object.values(grupos).forEach(g => {
+                if (!g.nota || g.tributos.length === 0) return;
+                const grupoId = 'grupo-' + contadorGrupo++;
+                const bancoPadrao  = g.nota.querySelector('.select-banco').value;
+                const classifPadrao = g.nota.querySelector('.select-classificacao').value;
+
+                [g.nota, ...g.tributos].forEach((linha, idx) => {
+                    linha.setAttribute('data-grupo', grupoId);
+                    const sel = linha.querySelector('.select-banco');
+                    sel.value = bancoPadrao;
+                    linha.querySelector('.select-classificacao').value = classifPadrao;
+                    atualizarCorDaLinha(sel, false);
+                    const cf = linha.querySelectorAll('td')[1];
+                    if (idx === 0) {
+                        if (!cf.innerHTML.includes('🔗')) cf.innerHTML = `🔗 ${cf.innerHTML}`;
+                    } else {
+                        linha.classList.add('linha-imposto');
+                        if (!cf.innerHTML.includes('↳')) cf.innerHTML = `↳ ${cf.innerHTML}`;
+                    }
+                });
+                total++;
+            });
+
+            calcularTotais();
+            alert(total > 0
+                ? `${total} nota(s) consolidada(s) automaticamente com seus tributos.`
+                : 'Nenhuma nota com tributos vinculados foi encontrada para consolidar.');
+        }
+
+        function desagruparSelecionados() {
+            const checkboxes = document.querySelectorAll('#tabela-pagamentos input[type="checkbox"]:checked');
+            let alterou = false;
+            checkboxes.forEach(cb => {
+                const linha = cb.closest('tr');
+                if (linha.hasAttribute('data-grupo')) {
+                    linha.removeAttribute('data-grupo');
+                    const cf = linha.querySelectorAll('td')[1];
+                    cf.innerHTML = cf.innerHTML.replace('🔗 ','').replace('↳ ','');
+                    linha.classList.remove('linha-imposto');
+                    alterou = true;
+                }
+                cb.checked = false;
+            });
+            if (alterou) calcularTotais();
+        }
+
+        function atualizarCorDaLinha(selectElement, propagar = true) {
+            const banco = selectElement.value;
+            const linha = selectElement.closest('tr');
+
+            linha.className = 'border-b hover:bg-gray-100 transition-colors duration-300';
+            selectElement.className = 'select-banco rounded p-1 w-full text-center font-bold outline-none cursor-pointer transition-colors duration-300';
+
+            if (banco === "") {
+                linha.classList.add('bg-white');
+                selectElement.classList.add('bg-gray-200','text-gray-700');
+            } else if (coresBancos[banco]) {
+                linha.classList.add(...coresBancos[banco].linha.split(' '));
+                selectElement.classList.add(...coresBancos[banco].seletor.split(' '));
+            }
+
+            const grupoId = linha.getAttribute('data-grupo');
+            if (grupoId && propagar) {
+                document.querySelectorAll(`#tabela-pagamentos tr[data-grupo="${grupoId}"]`).forEach(l => {
+                    if (l !== linha) {
+                        const s = l.querySelector('.select-banco');
+                        s.value = banco;
+                        atualizarCorDaLinha(s, false);
+                    }
+                });
+            }
+            if (propagar) calcularTotais();
+        }
+
+        function propagarClassificacao(selectElement) {
+            const classif = selectElement.value;
+            const linha   = selectElement.closest('tr');
+            const grupoId = linha.getAttribute('data-grupo');
+            if (grupoId) {
+                document.querySelectorAll(`#tabela-pagamentos tr[data-grupo="${grupoId}"]`).forEach(l => {
+                    if (l !== linha) l.querySelector('.select-classificacao').value = classif;
+                });
+            }
+            calcularTotais();
+        }
+
+        // ==========================================
+        // CALCULAR TOTAIS + TFOOT + BADGE
+        // ==========================================
+        function calcularTotais() {
+            let dadosBancos = {};
+            BANCOS_NOMES.forEach(b => dadosBancos[b] = { total: 0, qtd: 0, classificacoes: {} });
+
+            let valorGeralNaTela = 0;
+            const linhas = document.querySelectorAll('#tabela-pagamentos tr');
+            let somaGrupos = {}, gruposProcessados = {}, semBancoCount = 0;
+
+            linhas.forEach(linha => {
+                const grupoId = linha.getAttribute('data-grupo');
+                if (grupoId) {
+                    const v = textoParaNumero(linha.querySelector('.valor-texto').innerText);
+                    if (!somaGrupos[grupoId]) somaGrupos[grupoId] = { valor: 0 };
+                    somaGrupos[grupoId].valor += v;
+                }
+                if (!linha.querySelector('.select-banco')?.value) semBancoCount++;
+            });
+
+            // Badge
+            const badge = document.getElementById('badge-pendentes');
+            if (semBancoCount > 0) { badge.textContent = semBancoCount; badge.classList.remove('hidden'); }
+            else badge.classList.add('hidden');
+
+            linhas.forEach(linha => {
+                const sel = linha.querySelector('.select-banco');
+                if (!sel) return;
+                const banco   = sel.value;
+                const celaVal = linha.querySelector('.valor-texto');
+                const valor   = textoParaNumero(celaVal.innerText);
+                const colunas = linha.querySelectorAll('td');
+                const nomeForn = colunas[1].innerText;
+                const numVouc  = colunas[2].innerText;
+                const classif  = linha.querySelector('.select-classificacao').value;
+                const grupoId  = linha.getAttribute('data-grupo');
+
+                valorGeralNaTela += (grupoId && !gruposProcessados[grupoId])
+                    ? somaGrupos[grupoId].valor
+                    : (!grupoId ? valor : 0);
+
+                if (banco !== "") {
+                    if (!dadosBancos[banco].classificacoes[classif])
+                        dadosBancos[banco].classificacoes[classif] = { total: 0, qtd: 0, htmlItens: '', fitaItens: '' };
+
+                    if (grupoId) {
+                        if (!gruposProcessados[grupoId]) {
+                            const vg = somaGrupos[grupoId].valor;
+                            dadosBancos[banco].classificacoes[classif].total    += vg;
+                            dadosBancos[banco].classificacoes[classif].qtd      += 1;
+                            dadosBancos[banco].classificacoes[classif].fitaItens += `${formatarMoeda(vg)} +<br>`;
+                            dadosBancos[banco].classificacoes[classif].htmlItens +=
+                                `<div style="display:flex;justify-content:space-between;border-bottom:1px dashed #ccc;padding:2px 0;">
+                                    <span class="truncate pr-2">${nomeForn} (Agrupado)</span>
+                                    <span>${formatarMoeda(vg)}</span>
+                                </div>`;
+                            dadosBancos[banco].total += vg;
+                            dadosBancos[banco].qtd   += 1;
+                            gruposProcessados[grupoId] = true;
+                        }
+                    } else {
+                        dadosBancos[banco].classificacoes[classif].total    += valor;
+                        dadosBancos[banco].classificacoes[classif].qtd      += 1;
+                        dadosBancos[banco].classificacoes[classif].fitaItens += `${celaVal.innerText} +<br>`;
+                        dadosBancos[banco].classificacoes[classif].htmlItens +=
+                            `<div style="display:flex;justify-content:space-between;border-bottom:1px dashed #ccc;padding:2px 0;">
+                                <span class="truncate pr-2">${nomeForn} (Voucher: ${numVouc})</span>
+                                <span>${celaVal.innerText}</span>
+                            </div>`;
+                        dadosBancos[banco].total += valor;
+                        dadosBancos[banco].qtd   += 1;
+                    }
+                }
+            });
+
+            document.getElementById('dashboard-total').innerText = `R$ ${formatarMoeda(valorGeralNaTela)}`;
+            document.getElementById('dashboard-qtd').innerText   = linhas.length;
+
+            const dataPagamentoRaw = document.getElementById('data-pagamento-global').value;
+            let dataPagamentoFormatada = "";
+            if (dataPagamentoRaw) {
+                const pts = dataPagamentoRaw.split('-');
+                dataPagamentoFormatada = `${pts[2]}/${pts[1]}/${pts[0]}`;
+            }
+
+            // Atualiza fitas
+            BANCOS_NOMES.forEach(banco => {
+                const elTit  = document.getElementById(`titulo-${banco}`);
+                const elSoma = document.getElementById(`soma-${banco}`);
+                const elTot  = document.getElementById(`total-${banco}`);
+                const elDet  = document.getElementById(`detalhes-${banco}`);
+                if (!elTit || !elSoma || !elTot || !elDet) return;
+
+                elTit.innerText = `${banco.toUpperCase()} - ${dadosBancos[banco].qtd} PAGAMENTOS`;
+
+                if (dadosBancos[banco].qtd > 0) {
+                    let htmlFita = '', htmlImp = '';
+                    if (dataPagamentoFormatada)
+                        htmlImp += `<div class="font-bold text-[11px] mb-2 pb-1 border-b border-black">Data de Pagamento: ${dataPagamentoFormatada}</div>`;
+                    for (let cl in dadosBancos[banco].classificacoes) {
+                        const g = dadosBancos[banco].classificacoes[cl];
+                        htmlFita += g.fitaItens;
+                        htmlImp  += `<div class="mt-2 mb-1 font-bold text-[11px] bg-gray-200 p-1 uppercase">${cl}</div>
+                                     ${g.htmlItens}
+                                     <div class="text-right font-bold mt-1 text-[11px] border-b-2 border-black pb-1 mb-2">Subtotal (${g.qtd}): R$ ${formatarMoeda(g.total)}</div>`;
+                    }
+                    elSoma.innerHTML = htmlFita;
+                    elTot.innerText  = `${formatarMoeda(dadosBancos[banco].total)} *`;
+                    elDet.innerHTML  = htmlImp;
+                    elTit.closest('.bg-white').classList.remove('opacity-60');
+                } else {
+                    elSoma.innerHTML = `0,00 +<br>`;
+                    elTot.innerText  = `0,00 *`;
+                    elDet.innerHTML  = '';
+                    elTit.closest('.bg-white').classList.add('opacity-60');
+                }
+            });
+
+            // Atualiza tfoot
+            const tfoot = document.getElementById('tfoot-totais');
+            if (tfoot) {
+                const comDados = BANCOS_NOMES.filter(b => dadosBancos[b].qtd > 0);
+                if (comDados.length === 0) { tfoot.innerHTML = ''; }
+                else {
+                    tfoot.innerHTML = comDados.map(banco => `
+                        <tr>
+                            <td colspan="5" class="px-4 py-1 text-right text-gray-500 text-xs">
+                                ${BANCOS_LABEL[banco]}: <strong>${dadosBancos[banco].qtd} pag.</strong>
+                            </td>
+                            <td class="px-4 py-1 font-mono font-bold text-gray-700 text-xs text-right">
+                                R$ ${formatarMoeda(dadosBancos[banco].total)}
+                            </td>
+                            <td colspan="7"></td>
+                        </tr>`).join('');
+                }
+            }
+
+            salvarEstadoLocal();
+        }
+
+        // ==========================================
+        // IMPRIMIR FITA
+        // ==========================================
+        function imprimirFita(banco) {
+            const fita = document.getElementById(`titulo-${banco}`).closest('.bg-white');
+            const pai  = fita.parentNode;
+            const irm  = fita.nextSibling;
+
+            const outros = Array.from(document.body.children).filter(el => el !== fita);
+            outros.forEach(el => el.style.setProperty('display', 'none', 'important'));
+            document.body.appendChild(fita);
+            fita.classList.add('area-impressao');
+
+            window.print();
+
+            fita.classList.remove('area-impressao');
+            if (irm) pai.insertBefore(fita, irm);
+            else      pai.appendChild(fita);
+            outros.forEach(el => el.style.removeProperty('display'));
+        }
+
+        // ==========================================
+        // PROCESSAMENTO DE PDFs
+        // ==========================================
+        const COLUNAS_JDE = [
+            { nome: 'beneficiario', xMin: 0,   xMax: 183 },
+            { nome: 'tp',           xMin: 183, xMax: 200 },
+            { nome: 'voucher',      xMin: 200, xMax: 234 },
+            { nome: 'cia',          xMin: 234, xMax: 258 },
+            { nome: 'item',         xMin: 258, xMax: 275 },
+            { nome: 'dtFatura',     xMin: 275, xMax: 312 },
+            { nome: 'valor',        xMin: 312, xMax: 365 },
+            { nome: 'status',       xMin: 365, xMax: 388 },
+            { nome: 'fornecedor',   xMin: 388, xMax: 545 },
+            { nome: 'faturaRet',    xMin: 545, xMax: 738 },
+            { nome: 'dtVenc',       xMin: 738, xMax: 999 },
+        ];
+
+        function colunaDoX(x) {
+            const col = COLUNAS_JDE.find(c => x >= c.xMin && x < c.xMax);
+            return col ? col.nome : null;
+        }
+
+        function processarPDF(evento) {
+            const arquivos = Array.from(evento.target.files);
+            if (arquivos.length > 0) processarArquivosPDF(arquivos);
+            evento.target.value = '';
+        }
+
+        async function processarArquivosPDF(arquivos) {
+            const tiposValidos = ["PP", "PD", "PH", "PI", "PS", "PV", "NO", "P4", "P5", "P8"];
+            let totalAdicionados = 0;
+
+            for (const arquivo of arquivos) {
+                const buffer = await arquivo.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(new Uint8Array(buffer)).promise;
+                let fornecedorPendente = null;
+
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const pagina = await pdf.getPage(i);
+                    const conteudo = await pagina.getTextContent();
+
+                    let linhasPorY = {};
+                    conteudo.items.forEach(item => {
+                        let y = Math.round(item.transform[5]);
+                        let x = item.transform[4];
+                        let texto = item.str.trim();
+                        if (!texto) return;
+                        let chaveY = null;
+                        for (let yE in linhasPorY) {
+                            if (Math.abs(parseInt(yE) - y) <= 4) { chaveY = yE; break; }
+                        }
+                        if (!chaveY) { chaveY = y; linhasPorY[chaveY] = []; }
+                        linhasPorY[chaveY].push({ x, text: texto });
+                    });
+
+                    Object.keys(linhasPorY).sort((a, b) => b - a).forEach(y => {
+                        let campos = {};
+                        linhasPorY[y].sort((a, b) => a.x - b.x).forEach(item => {
+                            const col = colunaDoX(item.x);
+                            if (!col) return;
+                            campos[col] = campos[col] ? `${campos[col]} ${item.text}` : item.text;
+                        });
+
+                        const tpTexto = (campos.tp || '').trim();
+                        if (tiposValidos.includes(tpTexto)) {
+                            const matchCodBenef = (campos.beneficiario || '').match(/^(\d{5,10})/);
+                            const codBeneficiario = matchCodBenef ? matchCodBenef[1] : '';
+                            const nomeBenef = (campos.beneficiario || '').replace(/^\d{5,10}\s*/, '').trim();
+                            const fornecedor  = nomeBenef || fornecedorPendente || 'FORNECEDOR JDE';
+                            const voucher     = (campos.voucher   || '').trim();
+                            const valor       = (campos.valor     || '').trim();
+                            const fatura      = (campos.faturaRet || '').trim() || 'FATURA / RECIBO JDE';
+                            const vencimento  = (campos.dtVenc    || '').trim() || '-';
+                            const matchCodForn = (campos.fornecedor || '').match(/^(\d{5,10})/);
+                            const codFornecedor = matchCodForn ? matchCodForn[1] : codBeneficiario;
+
+                            if (voucher && valor) {
+                                if (adicionarLinhaTabela(fornecedor, voucher, fatura, vencimento,
+                                    valor, codBeneficiario, tpTexto, codFornecedor)) {
+                                    totalAdicionados++;
+                                }
+                            }
+                            fornecedorPendente = null;
+                        } else if (campos.beneficiario && !campos.valor && !campos.voucher) {
+                            const texto = campos.beneficiario.trim();
+                            if (texto && !/^(Total:|Relatório|Page|Beneficiário|Valor Total|Número Total)/.test(texto)) {
+                                fornecedorPendente = texto.replace(/^\d{5,10}\s*/, '').trim();
+                            }
+                        }
+                    });
+                }
+            }
+
+            alert(`Importação concluída! ${totalAdicionados} novos pagamentos adicionados de ${arquivos.length} arquivo(s).`);
+            calcularTotais();
+        }
+
+        // ==========================================
+        // CONTROLE DE ABAS
+        // ==========================================
+        function alternarAba(abaDestino) {
+            document.getElementById('aba-distribuicao').classList.toggle('hidden', abaDestino !== 'distribuicao');
+            document.getElementById('aba-conciliacao').classList.toggle('hidden',  abaDestino !== 'conciliacao');
+            document.getElementById('btn-distribuicao').className = abaDestino === 'distribuicao'
+                ? "bg-indigo-900 text-white px-6 py-2 rounded shadow font-bold transition"
+                : "bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded shadow font-bold transition";
+            document.getElementById('btn-conciliacao').className = abaDestino === 'conciliacao'
+                ? "bg-indigo-900 text-white px-6 py-2 rounded shadow font-bold transition"
+                : "bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded shadow font-bold transition";
+        }
+
+        // ==========================================
+        // INICIALIZAÇÃO
+        // ==========================================
+        window.onload = function () {
+            aplicarModoEscuroSalvo();
+            carregarRegras();
+            carregarResponsavel();
+            carregarEstadoLocal();
+            calcularTotais();
+        };
+    </script>
+</body>
+</html>
