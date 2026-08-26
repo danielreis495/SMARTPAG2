@@ -457,10 +457,9 @@
             </div>
         </section>
     </div>
-    </div>
 
     <!-- ============================================================ -->
-    <!-- ABA 2: CONCILIAÇÃO                                           -->
+    <!-- ABA 3: CONCILIAÇÃO                                           -->
     <!-- ============================================================ -->
     <div id="aba-conciliacao" class="hidden">
         <header class="flex justify-between items-center bg-white p-4 rounded shadow mb-4 border-t-8 border-yellow-500 flex-wrap gap-3">
@@ -1757,13 +1756,26 @@
         // ==========================================
         function alternarAba(abaDestino) {
             document.getElementById('aba-distribuicao').classList.toggle('hidden', abaDestino !== 'distribuicao');
+            document.getElementById('aba-resumo').classList.toggle('hidden',       abaDestino !== 'resumo');
             document.getElementById('aba-conciliacao').classList.toggle('hidden',  abaDestino !== 'conciliacao');
-            document.getElementById('btn-distribuicao').className = abaDestino === 'distribuicao'
-                ? "bg-indigo-900 text-white px-6 py-2 rounded shadow font-bold transition"
-                : "bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded shadow font-bold transition";
-            document.getElementById('btn-conciliacao').className = abaDestino === 'conciliacao'
-                ? "bg-indigo-900 text-white px-6 py-2 rounded shadow font-bold transition"
-                : "bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded shadow font-bold transition";
+
+            const botoes = {
+                'distribuicao': document.getElementById('btn-distribuicao'),
+                'resumo':       document.getElementById('btn-resumo'),
+                'conciliacao':  document.getElementById('btn-conciliacao'),
+            };
+
+            Object.entries(botoes).forEach(([chave, btn]) => {
+                if (btn) {
+                    btn.className = chave === abaDestino
+                        ? "bg-indigo-900 text-white px-5 py-2 rounded shadow font-bold transition flex items-center gap-2"
+                        : "bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded shadow font-bold transition flex items-center gap-2";
+                }
+            });
+
+            if (abaDestino === 'resumo') {
+                calcularTotais();
+            }
         }
 
         // ==========================================
