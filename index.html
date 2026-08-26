@@ -108,11 +108,30 @@
         /* ============ TFOOT ============ */
         #tfoot-totais tr td { padding: 5px 16px; font-size: 0.8rem; }
 
+        /* ============ FITA EM COLUNAS ============ */
+        .fita-colunas {
+            display: block;
+            columns: 2 105px;
+            column-gap: 12px;
+            column-rule: 1px dashed #cbd5e1;
+            max-height: 270px;
+            overflow-y: auto;
+            text-align: right;
+            padding-right: 4px;
+        }
+        @media print {
+            .fita-colunas {
+                columns: 3 115px !important;
+                max-height: 480px !important;
+                overflow: visible !important;
+            }
+        }
+
         /* ============ RELATÓRIO ============ */
         #area-relatorio-print { display: none; }
     </style>
 </head>
-<body class="bg-gray-100 p-6" id="body-main">
+<body class="bg-gray-100 p-4 sm:p-5" id="body-main">
 
     <!-- DROP OVERLAY -->
     <div id="drop-overlay">
@@ -121,14 +140,18 @@
     </div>
 
     <!-- NAV -->
-    <nav class="flex gap-4 mb-4 items-center">
+    <nav class="flex gap-3 mb-4 items-center flex-wrap">
         <button onclick="alternarAba('distribuicao')" id="btn-distribuicao"
-            class="bg-indigo-900 text-white px-6 py-2 rounded shadow font-bold transition">
-            Distribuição de Caixa
+            class="bg-indigo-900 text-white px-5 py-2 rounded shadow font-bold transition flex items-center gap-2">
+            📦 Distribuição de Caixa
+        </button>
+        <button onclick="alternarAba('resumo')" id="btn-resumo"
+            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded shadow font-bold transition flex items-center gap-2">
+            📊 Resumo &amp; Fitas Bancárias
         </button>
         <button onclick="alternarAba('conciliacao')" id="btn-conciliacao"
-            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-2 rounded shadow font-bold transition">
-            Conciliação Diária (Rede Local)
+            class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded shadow font-bold transition flex items-center gap-2">
+            🔄 Conciliação Diária (Rede Local)
         </button>
         <div class="ml-auto">
             <button onclick="alternarModoEscuro()" id="btn-dark"
@@ -257,7 +280,7 @@
                 </div>
             </div>
 
-            <div class="overflow-y-auto max-h-[50vh] overflow-x-auto relative">
+            <div class="overflow-y-auto max-h-[70vh] overflow-x-auto relative" style="min-height: 380px;">
                 <table class="w-full text-sm text-left border-collapse tabela-fixa">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-200">
                         <tr>
@@ -284,72 +307,156 @@
             </div>
         </section>
 
-        <!-- FITAS -->
-        <section class="bg-indigo-900 p-4 rounded shadow mt-6">
-            <h2 class="text-sm font-bold text-white text-center mb-4 uppercase">Fita de Cálculo e Resumo de Grupos</h2>
-            <div class="grid grid-cols-5 gap-4">
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- ABA 2: RESUMO POR BANCO & FITAS DE CÁLCULO                    -->
+    <!-- ============================================================ -->
+    <div id="aba-resumo" class="hidden">
+        <header class="flex justify-between items-center bg-white p-4 rounded shadow mb-4 border-t-8 border-indigo-700 flex-wrap gap-3">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Resumo por Banco &amp; Fitas de Cálculo</h1>
+                <p class="text-sm text-gray-500">Visão consolidada dos bancos e fitas digitais com distribuição em colunas</p>
+            </div>
+            <div class="flex gap-2 flex-wrap">
+                <button onclick="gerarRelatorioPDF()"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded font-bold transition flex items-center gap-2 shadow">
+                    📋 Imprimir Relatório PDF
+                </button>
+                <button onclick="exportarExcel()"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded font-bold transition flex items-center gap-2 shadow">
+                    📊 Exportar Excel
+                </button>
+            </div>
+        </header>
+
+        <!-- CARDS DE RESUMO GERAL POR BANCO -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
+            <!-- ITAÚ -->
+            <div class="bg-white p-3 rounded-lg shadow border-l-4 border-green-600">
+                <p class="text-xs font-bold text-green-700 uppercase">ITAÚ</p>
+                <p class="text-lg font-bold text-gray-800" id="card-total-itau">R$ 0,00</p>
+                <p class="text-xs text-gray-500 font-semibold" id="card-qtd-itau">0 pagamentos</p>
+            </div>
+            <!-- SANTANDER -->
+            <div class="bg-white p-3 rounded-lg shadow border-l-4 border-yellow-500">
+                <p class="text-xs font-bold text-yellow-600 uppercase">SANTANDER</p>
+                <p class="text-lg font-bold text-gray-800" id="card-total-santander">R$ 0,00</p>
+                <p class="text-xs text-gray-500 font-semibold" id="card-qtd-santander">0 pagamentos</p>
+            </div>
+            <!-- BRADESCO -->
+            <div class="bg-white p-3 rounded-lg shadow border-l-4 border-orange-600">
+                <p class="text-xs font-bold text-orange-600 uppercase">BRADESCO</p>
+                <p class="text-lg font-bold text-gray-800" id="card-total-bradesco">R$ 0,00</p>
+                <p class="text-xs text-gray-500 font-semibold" id="card-qtd-bradesco">0 pagamentos</p>
+            </div>
+            <!-- CAIXA -->
+            <div class="bg-white p-3 rounded-lg shadow border-l-4 border-blue-600">
+                <p class="text-xs font-bold text-blue-600 uppercase">CAIXA</p>
+                <p class="text-lg font-bold text-gray-800" id="card-total-caixa">R$ 0,00</p>
+                <p class="text-xs text-gray-500 font-semibold" id="card-qtd-caixa">0 pagamentos</p>
+            </div>
+            <!-- BRASIL -->
+            <div class="bg-white p-3 rounded-lg shadow border-l-4 border-pink-600">
+                <p class="text-xs font-bold text-pink-600 uppercase">BRASIL</p>
+                <p class="text-lg font-bold text-gray-800" id="card-total-brasil">R$ 0,00</p>
+                <p class="text-xs text-gray-500 font-semibold" id="card-qtd-brasil">0 pagamentos</p>
+            </div>
+            <!-- TOTAL GERAL -->
+            <div class="bg-indigo-900 text-white p-3 rounded-lg shadow">
+                <p class="text-xs font-bold text-indigo-200 uppercase">TOTAL GERAL</p>
+                <p class="text-lg font-bold text-white" id="card-total-geral">R$ 0,00</p>
+                <p class="text-xs text-indigo-200 font-semibold" id="card-qtd-geral">0 pagamentos</p>
+            </div>
+        </div>
+
+        <!-- FITAS EM GRID COM QUEBRA EM COLUNAS -->
+        <section class="bg-indigo-900 p-4 rounded-xl shadow">
+            <h2 class="text-sm font-bold text-white text-center mb-4 uppercase tracking-wider">Fitas de Cálculo por Banco &amp; Detalhes</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 <!-- ITAÚ -->
-                <div class="bg-white p-4 rounded shadow-inner flex flex-col items-center">
-                    <div id="titulo-itau" class="text-green-700 font-bold text-xs text-center border-b-2 border-green-700 w-full pb-1 mb-2">ITAÚ - 0 PAGAMENTOS</div>
-                    <div class="w-0 h-0 border-l-[15px] border-l-transparent border-t-[15px] border-t-green-500 border-r-[15px] border-r-transparent self-start mb-2"></div>
-                    <div class="font-mono text-right w-full text-gray-600 text-sm leading-relaxed">
-                        <span id="soma-itau">0,00 +<br></span>------------<br>
-                        <span class="text-xs">TOTAL</span><br>
-                        <span id="total-itau" class="text-black font-bold text-base">0,00 *</span>
+                <div class="bg-white p-4 rounded-lg shadow flex flex-col justify-between">
+                    <div>
+                        <div id="titulo-itau" class="text-green-700 font-bold text-xs text-center border-b-2 border-green-700 w-full pb-1 mb-2">ITAÚ - 0 PAGAMENTOS</div>
+                        <div class="w-0 h-0 border-l-[12px] border-l-transparent border-t-[12px] border-t-green-500 border-r-[12px] border-r-transparent self-start mb-2"></div>
+                        <div class="fita-colunas font-mono text-right text-gray-600 text-sm leading-relaxed">
+                            <span id="soma-itau">0,00 +<br></span>
+                        </div>
+                        <div class="border-t-2 border-gray-400 my-2 pt-1 flex justify-between items-center font-mono">
+                            <span class="text-xs font-bold text-gray-600">TOTAL</span>
+                            <span id="total-itau" class="text-black font-bold text-base">0,00 *</span>
+                        </div>
+                        <div id="detalhes-itau" class="detalhes-impressao mt-3 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
                     </div>
-                    <div id="detalhes-itau" class="detalhes-impressao mt-4 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
                     <button onclick="imprimirFita('itau')" class="mt-4 bg-green-600 hover:bg-green-700 text-white w-full py-2 rounded text-xs font-bold transition">🖨️ IMPRIMIR ITAÚ</button>
                 </div>
                 <!-- SANTANDER -->
-                <div class="bg-white p-4 rounded shadow-inner flex flex-col items-center">
-                    <div id="titulo-santander" class="text-yellow-600 font-bold text-xs text-center border-b-2 border-yellow-600 w-full pb-1 mb-2">SANTANDER - 0 PAGAMENTOS</div>
-                    <div class="w-0 h-0 border-l-[15px] border-l-transparent border-t-[15px] border-t-[#ccff00] border-r-[15px] border-r-transparent self-start mb-2"></div>
-                    <div class="font-mono text-right w-full text-gray-600 text-sm leading-relaxed">
-                        <span id="soma-santander">0,00 +<br></span>------------<br>
-                        <span class="text-xs">TOTAL</span><br>
-                        <span id="total-santander" class="text-black font-bold text-base">0,00 *</span>
+                <div class="bg-white p-4 rounded-lg shadow flex flex-col justify-between">
+                    <div>
+                        <div id="titulo-santander" class="text-yellow-600 font-bold text-xs text-center border-b-2 border-yellow-600 w-full pb-1 mb-2">SANTANDER - 0 PAGAMENTOS</div>
+                        <div class="w-0 h-0 border-l-[12px] border-l-transparent border-t-[12px] border-t-[#ccff00] border-r-[12px] border-r-transparent self-start mb-2"></div>
+                        <div class="fita-colunas font-mono text-right text-gray-600 text-sm leading-relaxed">
+                            <span id="soma-santander">0,00 +<br></span>
+                        </div>
+                        <div class="border-t-2 border-gray-400 my-2 pt-1 flex justify-between items-center font-mono">
+                            <span class="text-xs font-bold text-gray-600">TOTAL</span>
+                            <span id="total-santander" class="text-black font-bold text-base">0,00 *</span>
+                        </div>
+                        <div id="detalhes-santander" class="detalhes-impressao mt-3 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
                     </div>
-                    <div id="detalhes-santander" class="detalhes-impressao mt-4 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
                     <button onclick="imprimirFita('santander')" class="mt-4 bg-[#ccff00] hover:bg-yellow-400 text-black w-full py-2 rounded text-xs font-bold transition">🖨️ IMPRIMIR SANTANDER</button>
                 </div>
                 <!-- BRADESCO -->
-                <div class="bg-white p-4 rounded shadow-inner flex flex-col items-center">
-                    <div id="titulo-bradesco" class="text-orange-600 font-bold text-xs text-center border-b-2 border-orange-600 w-full pb-1 mb-2">BRADESCO - 0 PAGAMENTOS</div>
-                    <div class="w-0 h-0 border-l-[15px] border-l-transparent border-t-[15px] border-t-orange-500 border-r-[15px] border-r-transparent self-start mb-2"></div>
-                    <div class="font-mono text-right w-full text-gray-600 text-sm leading-relaxed">
-                        <span id="soma-bradesco">0,00 +<br></span>------------<br>
-                        <span class="text-xs">TOTAL</span><br>
-                        <span id="total-bradesco" class="text-black font-bold text-base">0,00 *</span>
+                <div class="bg-white p-4 rounded-lg shadow flex flex-col justify-between">
+                    <div>
+                        <div id="titulo-bradesco" class="text-orange-600 font-bold text-xs text-center border-b-2 border-orange-600 w-full pb-1 mb-2">BRADESCO - 0 PAGAMENTOS</div>
+                        <div class="w-0 h-0 border-l-[12px] border-l-transparent border-t-[12px] border-t-orange-500 border-r-[12px] border-r-transparent self-start mb-2"></div>
+                        <div class="fita-colunas font-mono text-right text-gray-600 text-sm leading-relaxed">
+                            <span id="soma-bradesco">0,00 +<br></span>
+                        </div>
+                        <div class="border-t-2 border-gray-400 my-2 pt-1 flex justify-between items-center font-mono">
+                            <span class="text-xs font-bold text-gray-600">TOTAL</span>
+                            <span id="total-bradesco" class="text-black font-bold text-base">0,00 *</span>
+                        </div>
+                        <div id="detalhes-bradesco" class="detalhes-impressao mt-3 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
                     </div>
-                    <div id="detalhes-bradesco" class="detalhes-impressao mt-4 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
                     <button onclick="imprimirFita('bradesco')" class="mt-4 bg-orange-600 hover:bg-orange-700 text-white w-full py-2 rounded text-xs font-bold transition">🖨️ IMPRIMIR BRADESCO</button>
                 </div>
                 <!-- CAIXA -->
-                <div class="bg-white p-4 rounded shadow-inner flex flex-col items-center">
-                    <div id="titulo-caixa" class="text-blue-600 font-bold text-xs text-center border-b-2 border-blue-600 w-full pb-1 mb-2">CAIXA - 0 PAGAMENTOS</div>
-                    <div class="w-0 h-0 border-l-[15px] border-l-transparent border-t-[15px] border-t-blue-500 border-r-[15px] border-r-transparent self-start mb-2"></div>
-                    <div class="font-mono text-right w-full text-gray-600 text-sm leading-relaxed">
-                        <span id="soma-caixa">0,00 +<br></span>------------<br>
-                        <span class="text-xs">TOTAL</span><br>
-                        <span id="total-caixa" class="text-black font-bold text-base">0,00 *</span>
+                <div class="bg-white p-4 rounded-lg shadow flex flex-col justify-between">
+                    <div>
+                        <div id="titulo-caixa" class="text-blue-600 font-bold text-xs text-center border-b-2 border-blue-600 w-full pb-1 mb-2">CAIXA - 0 PAGAMENTOS</div>
+                        <div class="w-0 h-0 border-l-[12px] border-l-transparent border-t-[12px] border-t-blue-500 border-r-[12px] border-r-transparent self-start mb-2"></div>
+                        <div class="fita-colunas font-mono text-right text-gray-600 text-sm leading-relaxed">
+                            <span id="soma-caixa">0,00 +<br></span>
+                        </div>
+                        <div class="border-t-2 border-gray-400 my-2 pt-1 flex justify-between items-center font-mono">
+                            <span class="text-xs font-bold text-gray-600">TOTAL</span>
+                            <span id="total-caixa" class="text-black font-bold text-base">0,00 *</span>
+                        </div>
+                        <div id="detalhes-caixa" class="detalhes-impressao mt-3 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
                     </div>
-                    <div id="detalhes-caixa" class="detalhes-impressao mt-4 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
                     <button onclick="imprimirFita('caixa')" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded text-xs font-bold transition">🖨️ IMPRIMIR CAIXA</button>
                 </div>
                 <!-- BRASIL -->
-                <div class="bg-white p-4 rounded shadow-inner flex flex-col items-center">
-                    <div id="titulo-brasil" class="text-pink-600 font-bold text-xs text-center border-b-2 border-pink-600 w-full pb-1 mb-2">BRASIL - 0 PAGAMENTOS</div>
-                    <div class="w-0 h-0 border-l-[15px] border-l-transparent border-t-[15px] border-t-pink-500 border-r-[15px] border-r-transparent self-start mb-2"></div>
-                    <div class="font-mono text-right w-full text-gray-600 text-sm leading-relaxed">
-                        <span id="soma-brasil">0,00 +<br></span>------------<br>
-                        <span class="text-xs">TOTAL</span><br>
-                        <span id="total-brasil" class="text-black font-bold text-base">0,00 *</span>
+                <div class="bg-white p-4 rounded-lg shadow flex flex-col justify-between">
+                    <div>
+                        <div id="titulo-brasil" class="text-pink-600 font-bold text-xs text-center border-b-2 border-pink-600 w-full pb-1 mb-2">BRASIL - 0 PAGAMENTOS</div>
+                        <div class="w-0 h-0 border-l-[12px] border-l-transparent border-t-[12px] border-t-pink-500 border-r-[12px] border-r-transparent self-start mb-2"></div>
+                        <div class="fita-colunas font-mono text-right text-gray-600 text-sm leading-relaxed">
+                            <span id="soma-brasil">0,00 +<br></span>
+                        </div>
+                        <div class="border-t-2 border-gray-400 my-2 pt-1 flex justify-between items-center font-mono">
+                            <span class="text-xs font-bold text-gray-600">TOTAL</span>
+                            <span id="total-brasil" class="text-black font-bold text-base">0,00 *</span>
+                        </div>
+                        <div id="detalhes-brasil" class="detalhes-impressao mt-3 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
                     </div>
-                    <div id="detalhes-brasil" class="detalhes-impressao mt-4 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
                     <button onclick="imprimirFita('brasil')" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white w-full py-2 rounded text-xs font-bold transition">🖨️ IMPRIMIR BRASIL</button>
                 </div>
             </div>
         </section>
+    </div>
     </div>
 
     <!-- ============================================================ -->
@@ -670,6 +777,8 @@
                     fatura:          colunas[3].innerText,
                     vencimento:      colunas[4].innerText,
                     valor:           linha.querySelector('.valor-texto').innerText,
+                    valorOriginal:   linha.getAttribute('data-valor-original') || linha.querySelector('.valor-texto').innerText,
+                    ajuste:          linha.getAttribute('data-ajuste') || '',
                     codBeneficiario: colunas[6]?.innerText || '-',
                     tipoDocumento:   colunas[7]?.innerText || '-',
                     codFornecedor:   colunas[8]?.innerText || '-',
@@ -703,7 +812,7 @@
                 const novaTr = criarLinhaTR(
                     dado.fornecedorHTML, dado.voucher, dado.fatura, dado.vencimento,
                     dado.valor, dado.codBeneficiario, dado.tipoDocumento, dado.codFornecedor,
-                    dado.observacao || ''
+                    dado.observacao || '', dado.valorOriginal, dado.ajuste
                 );
                 if (dado.grupoId) novaTr.setAttribute('data-grupo', dado.grupoId);
                 tbody.appendChild(novaTr);
@@ -1057,10 +1166,37 @@
         }
 
         function editarValor(botao) {
+            const linha = botao.closest('tr');
             const spanTexto = botao.previousElementSibling;
-            const novoValor = prompt("Digite o novo valor (Ex: 1.500,00):", spanTexto.innerText);
+            const valorAtual = spanTexto.innerText;
+            const valOrig = linha.getAttribute('data-valor-original') || valorAtual;
+
+            const novoValor = prompt("Digite o novo valor (Ex: 1.500,00):", valorAtual);
             if (novoValor !== null && novoValor.trim() !== "") {
                 spanTexto.innerText = novoValor;
+                const nOrig = textoParaNumero(valOrig);
+                const nNovo = textoParaNumero(novoValor);
+                const diff = Math.round((nNovo - nOrig) * 100) / 100;
+
+                if (Math.abs(diff) > 0.001) {
+                    const sinal = diff > 0 ? '+' : '-';
+                    const valDifFormatado = formatarMoeda(Math.abs(diff));
+                    const textoAjuste = `tem ajuste de ${sinal}R$ ${valDifFormatado}`;
+                    linha.setAttribute('data-ajuste', textoAjuste);
+
+                    let badge = linha.querySelector('.badge-ajuste');
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.className = 'badge-ajuste text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded ml-1';
+                        botao.parentElement.appendChild(badge);
+                    }
+                    badge.innerText = `✏️ ${sinal}R$ ${valDifFormatado}`;
+                    badge.title = textoAjuste;
+                } else {
+                    linha.removeAttribute('data-ajuste');
+                    const badge = linha.querySelector('.badge-ajuste');
+                    if (badge) badge.remove();
+                }
                 calcularTotais();
             }
         }
@@ -1073,10 +1209,17 @@
         }
 
         function criarLinhaTR(fornecedorHTML, voucher, fatura, vencimento, valor,
-                               codBeneficiario, tipoDocumento, codFornecedor, observacao) {
+                               codBeneficiario, tipoDocumento, codFornecedor, observacao, valorOriginal, ajuste) {
             const obs = (observacao || '').replace(/"/g, '&quot;');
+            const vOrig = valorOriginal || valor;
+            const aj = ajuste || '';
+            const badgeAjusteHtml = aj ? `<span class="badge-ajuste text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded ml-1" title="${aj}">✏️ ${aj.replace('tem ajuste de ', '')}</span>` : '';
+
             const novaTr = document.createElement('tr');
             novaTr.className = 'border-b hover:bg-gray-100 transition-colors duration-300';
+            novaTr.setAttribute('data-valor-original', vOrig);
+            if (aj) novaTr.setAttribute('data-ajuste', aj);
+
             novaTr.innerHTML = `
                 <td class="px-3 py-2 border text-center"><input type="checkbox" class="w-4 h-4 text-green-600 cursor-pointer"></td>
                 <td class="px-3 py-2 border font-bold">${fornecedorHTML}</td>
@@ -1085,6 +1228,7 @@
                 <td class="px-3 py-2 border">${vencimento}</td>
                 <td class="px-3 py-2 border font-mono text-right flex justify-end items-center gap-2">
                     <span class="valor-texto">${valor}</span>
+                    ${badgeAjusteHtml}
                     <button onclick="editarValor(this)" class="text-gray-400 hover:text-blue-600 cursor-pointer text-base" title="Alterar Valor">✏️</button>
                 </td>
                 <td class="px-3 py-2 border text-center">${codBeneficiario || '-'}</td>
@@ -1133,7 +1277,7 @@
 
             const tbody = document.getElementById('tabela-pagamentos');
             const novaTr = criarLinhaTR(fornecedor, voucher, fatura, vencimento, valor,
-                                         codBeneficiario, tipoDocumento, codFornecedor, '');
+                                         codBeneficiario, tipoDocumento, codFornecedor, '', valor, '');
             tbody.appendChild(novaTr);
 
             const sel = novaTr.querySelector('.select-banco');
@@ -1372,6 +1516,9 @@
                     if (!dadosBancos[banco].classificacoes[classif])
                         dadosBancos[banco].classificacoes[classif] = { total: 0, qtd: 0, htmlItens: '', fitaItens: '' };
 
+                    const ajLinha = linha.getAttribute('data-ajuste') || '';
+                    const ajTag = ajLinha ? ` <span style="color:#b45309; font-weight:bold; font-size:10px;">(${ajLinha})</span>` : '';
+
                     if (grupoId) {
                         if (!gruposProcessados[grupoId]) {
                             const vg = somaGrupos[grupoId].valor;
@@ -1380,7 +1527,7 @@
                             dadosBancos[banco].classificacoes[classif].fitaItens += `${formatarMoeda(vg)} +<br>`;
                             dadosBancos[banco].classificacoes[classif].htmlItens +=
                                 `<div style="display:flex;justify-content:space-between;border-bottom:1px dashed #ccc;padding:2px 0;">
-                                    <span class="truncate pr-2">${nomeForn} (Agrupado)</span>
+                                    <span class="truncate pr-2">${nomeForn} (Agrupado)${ajTag}</span>
                                     <span>${formatarMoeda(vg)}</span>
                                 </div>`;
                             dadosBancos[banco].total += vg;
@@ -1393,7 +1540,7 @@
                         dadosBancos[banco].classificacoes[classif].fitaItens += `${celaVal.innerText} +<br>`;
                         dadosBancos[banco].classificacoes[classif].htmlItens +=
                             `<div style="display:flex;justify-content:space-between;border-bottom:1px dashed #ccc;padding:2px 0;">
-                                <span class="truncate pr-2">${nomeForn} (Voucher: ${numVouc})</span>
+                                <span class="truncate pr-2">${nomeForn} (Voucher: ${numVouc})${ajTag}</span>
                                 <span>${celaVal.innerText}</span>
                             </div>`;
                         dadosBancos[banco].total += valor;
@@ -1405,25 +1552,38 @@
             document.getElementById('dashboard-total').innerText = `R$ ${formatarMoeda(valorGeralNaTela)}`;
             document.getElementById('dashboard-qtd').innerText   = linhas.length;
 
-            const dataPagamentoRaw = document.getElementById('data-pagamento-global').value;
-            let dataPagamentoFormatada = "";
-            if (dataPagamentoRaw) {
-                const pts = dataPagamentoRaw.split('-');
-                dataPagamentoFormatada = `${pts[2]}/${pts[1]}/${pts[0]}`;
-            }
+            // Atualiza fitas e cards de resumo
+            let totalGeralResumo = 0;
+            let qtdGeralResumo   = 0;
 
-            // Atualiza fitas
             BANCOS_NOMES.forEach(banco => {
                 const elTit  = document.getElementById(`titulo-${banco}`);
                 const elSoma = document.getElementById(`soma-${banco}`);
                 const elTot  = document.getElementById(`total-${banco}`);
                 const elDet  = document.getElementById(`detalhes-${banco}`);
+
+                const cardTot = document.getElementById(`card-total-${banco}`);
+                const cardQtd = document.getElementById(`card-qtd-${banco}`);
+                if (cardTot && cardQtd) {
+                    cardTot.innerText = `R$ ${formatarMoeda(dadosBancos[banco].total)}`;
+                    cardQtd.innerText = `${dadosBancos[banco].qtd} pagamentos`;
+                }
+                totalGeralResumo += dadosBancos[banco].total;
+                qtdGeralResumo   += dadosBancos[banco].qtd;
+
                 if (!elTit || !elSoma || !elTot || !elDet) return;
 
                 elTit.innerText = `${banco.toUpperCase()} - ${dadosBancos[banco].qtd} PAGAMENTOS`;
 
                 if (dadosBancos[banco].qtd > 0) {
                     let htmlFita = '', htmlImp = '';
+                    const dataPagamentoRaw = document.getElementById('data-pagamento-global').value;
+                    let dataPagamentoFormatada = "";
+                    if (dataPagamentoRaw) {
+                        const pts = dataPagamentoRaw.split('-');
+                        dataPagamentoFormatada = `${pts[2]}/${pts[1]}/${pts[0]}`;
+                    }
+
                     if (dataPagamentoFormatada)
                         htmlImp += `<div class="font-bold text-[11px] mb-2 pb-1 border-b border-black">Data de Pagamento: ${dataPagamentoFormatada}</div>`;
                     for (let cl in dadosBancos[banco].classificacoes) {
@@ -1444,6 +1604,13 @@
                     elTit.closest('.bg-white').classList.add('opacity-60');
                 }
             });
+
+            const cardTotGeral = document.getElementById('card-total-geral');
+            const cardQtdGeral = document.getElementById('card-qtd-geral');
+            if (cardTotGeral && cardQtdGeral) {
+                cardTotGeral.innerText = `R$ ${formatarMoeda(totalGeralResumo)}`;
+                cardQtdGeral.innerText = `${qtdGeralResumo} pagamentos`;
+            }
 
             // Atualiza tfoot
             const tfoot = document.getElementById('tfoot-totais');

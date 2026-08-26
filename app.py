@@ -9,21 +9,23 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Estilo para tela cheia e visual limpo
+# Estilo para tela cheia, eliminando margens e espaços em branco vazios
 st.markdown(
     """
     <style>
-        #MainMenu {visibility: hidden;}
-        header {visibility: hidden;}
-        footer {visibility: hidden;}
+        #MainMenu, header, footer { visibility: hidden !important; height: 0 !important; }
+        .stApp {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
         .block-container {
             padding: 0 !important;
             margin: 0 !important;
             max-width: 100% !important;
         }
         iframe {
-            width: 100vw !important;
-            height: 100vh !important;
+            width: 100% !important;
+            min-height: 98vh !important;
             border: none !important;
         }
     </style>
@@ -37,6 +39,6 @@ html_path = os.path.join(os.path.dirname(__file__), "index.html")
 if os.path.exists(html_path):
     with open(html_path, "r", encoding="utf-8") as f:
         html_content = f.read()
-    components.html(html_content, height=1200, scrolling=True)
+    components.html(html_content, height=1600, scrolling=True)
 else:
     st.error("Arquivo index.html não encontrado no diretório do projeto.")
