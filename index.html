@@ -261,7 +261,9 @@
                 <table class="w-full text-sm text-left border-collapse tabela-fixa">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-200">
                         <tr>
-                            <th class="px-3 py-2 border bg-gray-200">Conf.</th>
+                            <th class="px-3 py-2 border bg-gray-200 text-center">
+                                <input type="checkbox" id="check-todos" onchange="selecionarTodos(this)" class="w-4 h-4 text-green-600 cursor-pointer" title="Marcar / Desmarcar Todos">
+                            </th>
                             <th class="px-3 py-2 border bg-gray-200">Fornecedor</th>
                             <th class="px-3 py-2 border bg-gray-200">Voucher</th>
                             <th class="px-3 py-2 border bg-gray-200">Fatura / Histórico</th>
@@ -1238,6 +1240,14 @@
             if (alterou) calcularTotais();
         }
 
+        function selecionarTodos(master) {
+            const visiveis = Array.from(document.querySelectorAll('#tabela-pagamentos tr')).filter(r => r.style.display !== 'none');
+            visiveis.forEach(r => {
+                const cb = r.querySelector('input[type="checkbox"]');
+                if (cb) cb.checked = master.checked;
+            });
+        }
+
         function atualizarCorDaLinha(selectElement, propagar = true) {
             const banco = selectElement.value;
             const linha = selectElement.closest('tr');
@@ -1253,22 +1263,60 @@
                 selectElement.classList.add(...coresBancos[banco].seletor.split(' '));
             }
 
-            const grupoId = linha.getAttribute('data-grupo');
-            if (grupoId && propagar) {
-                document.querySelectorAll(`#tabela-pagamentos tr[data-grupo="${grupoId}"]`).forEach(l => {
-                    if (l !== linha) {
-                        const s = l.querySelector('.select-banco');
-                        s.value = banco;
-                        atualizarCorDaLinha(s, false);
-                    }
-                });
+            if (propagar) {
+                // Se a linha alterada estiver marcada ou houver linhas marcadas, aplica a todas as marcadas
+                const checkboxLinha = linha.querySelector('input[type="checkbox"]');
+                const checkboxesMarcados = Array.from(document.querySelectorAll('#tabela-pagamentos input[type="checkbox"]:checked'));
+                
+                if (checkboxLinha?.checked || checkboxesMarcados.length > 1) {
+                    checkboxesMarcados.forEach(cb => {
+                        const l = cb.closest('tr');
+                        if (l && l !== linha) {
+                            const s = l.querySelector('.select-banco');
+                            if (s && s.value !== banco) {
+                                s.value = banco;
+                                atualizarCorDaLinha(s, false);
+                            }
+                        }
+                    });
+                }
+
+                // Se fizer parte de um grupo unido (🔗), propaga para o grupo
+                const grupoId = linha.getAttribute('data-grupo');
+                if (grupoId) {
+                    document.querySelectorAll(`#tabela-pagamentos tr[data-grupo="${grupoId}"]`).forEach(l => {
+                        if (l !== linha) {
+                            const s = l.querySelector('.select-banco');
+                            if (s && s.value !== banco) {
+                                s.value = banco;
+                                atualizarCorDaLinha(s, false);
+                            }
+                        }
+                    });
+                }
+
+                calcularTotais();
             }
-            if (propagar) calcularTotais();
         }
 
         function propagarClassificacao(selectElement) {
             const classif = selectElement.value;
             const linha   = selectElement.closest('tr');
+
+            // Se houver linhas marcadas no checkbox, aplica a classificação a todas as marcadas
+            const checkboxLinha = linha.querySelector('input[type="checkbox"]');
+            const checkboxesMarcados = Array.from(document.querySelectorAll('#tabela-pagamentos input[type="checkbox"]:checked'));
+            if (checkboxLinha?.checked || checkboxesMarcados.length > 1) {
+                checkboxesMarcados.forEach(cb => {
+                    const l = cb.closest('tr');
+                    if (l && l !== linha) {
+                        const sc = l.querySelector('.select-classificacao');
+                        if (sc) sc.value = classif;
+                    }
+                });
+            }
+
+            // Se fizer parte de um grupo unido (🔗)
             const grupoId = linha.getAttribute('data-grupo');
             if (grupoId) {
                 document.querySelectorAll(`#tabela-pagamentos tr[data-grupo="${grupoId}"]`).forEach(l => {
