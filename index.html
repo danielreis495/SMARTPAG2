@@ -329,6 +329,7 @@
             <select id="filtro-tipodoc" onchange="filtrarTabela()" class="filtro-input">
                 <option value="">Todos os Tipos</option>
                 <option value="PP">PP</option>
+                <option value="PR">PR</option>
                 <option value="PD">PD</option>
                 <option value="PS">PS</option>
                 <option value="PV">PV</option>
@@ -646,7 +647,7 @@
         let bancoDeDadosConciliacao = [];
         let regrasBanco = { porTipo: {}, porFornecedor: {} };
 
-        const TIPOS_DOC   = ["PP", "PD", "PH", "PI", "PS", "PV", "NO", "P4", "P5", "P8"];
+        const TIPOS_DOC   = ["PP", "PD", "PH", "PI", "PS", "PV", "PR", "NO", "P4", "P5", "P8"];
         const BANCOS_NOMES = ['itau', 'santander', 'bradesco', 'caixa', 'brasil'];
         const BANCOS_LABEL = { itau: 'Itaú', santander: 'Santander', bradesco: 'Bradesco', caixa: 'Caixa', brasil: 'Brasil' };
         const BANCOS_COR   = { itau: '#15803d', santander: '#b45309', bradesco: '#c2410c', caixa: '#1d4ed8', brasil: '#be185d' };
