@@ -1639,6 +1639,14 @@
                 }
 
                 calcularTotais();
+                if (banco && (checkboxLinha?.checked || checkboxesMarcados.length > 1)) {
+                    checkboxesMarcados.forEach(cb => { cb.checked = false; });
+                    const selecionarTodos = document.getElementById('check-todos');
+                    if (selecionarTodos) {
+                        selecionarTodos.checked = false;
+                        selecionarTodos.indeterminate = false;
+                    }
+                }
             }
         }
 
