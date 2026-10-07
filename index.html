@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartPag - Rede Local &amp; Conciliação</title>
-    <link rel="icon" type="image/png" href="image.png">
+    <meta name="theme-color" content="#18364e">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -148,34 +148,99 @@
 
         /* ============ RELATÓRIO ============ */
         #area-relatorio-print { display: none; }
+
+        /* Interface operacional: cores discretas e ações com hierarquia. */
+        @media screen {
+            body { font-family: "Open Sans", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:#f3f5f8; color:#243247; }
+            #body-main { padding:24px; max-width:1800px; margin:auto; }
+            .brand-bar { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+            .brand-mark { display:grid; place-items:center; background:#18364e; color:white; width:42px; height:42px; border-radius:12px; font-weight:700; }
+            .brand-name { font-size:20px; font-weight:700; letter-spacing:-.5px; }
+            .brand-caption { font-size:12px; color:#64748b; }
+            nav { padding:6px; background:#e8edf3; border-radius:12px; }
+            nav button { box-shadow:none!important; border-radius:8px!important; font-size:13px; font-weight:600!important; }
+            nav button.bg-indigo-900 { background:#18364e!important; }
+            nav button.bg-gray-300 { background:transparent!important; color:#526277!important; }
+            header { border-top:0!important; border:1px solid #e1e7ee; border-color:#e1e7ee!important; border-radius:12px!important; padding:20px!important; gap:18px; flex-wrap:wrap; }
+            header h1 { font-size:20px!important; letter-spacing:-.4px; }
+            header button, header label { background:#fff!important; color:#334155!important; border:1px solid #d7e0e9; box-shadow:none!important; font-size:12px; border-radius:7px!important; font-weight:600!important; }
+            header label:has(#upload-pdf), #btn-salvar { background:#18364e!important; color:white!important; border-color:#18364e; }
+            header button:hover, header label:hover { filter:brightness(.95); }
+            .shadow,.shadow-lg { box-shadow:0 2px 7px rgba(24,54,78,.04)!important; }
+            button, input, select, label { font-family:inherit!important; }
+            #aba-distribuicao > section { border-top:0!important; border:1px solid #e1e7ee; border-radius:12px; }
+            #aba-distribuicao > section > div:first-child { background:#fff!important; color:#334155!important; border-bottom:1px solid #e1e7ee; }
+            #aba-distribuicao > section > div:first-child > span { font-size:13px!important; font-weight:600; }
+            #aba-distribuicao > section > div:first-child button { background:#f1f5f9!important; color:#334155!important; border-color:#d7e0e9!important; font-weight:600; }
+            #tabela-pagamentos td:nth-child(6) { display:table-cell!important; white-space:nowrap; }
+            #tabela-pagamentos td:nth-child(6) button { font-size:10px; margin-left:6px; color:#64748b; }
+            #tabela-pagamentos td:nth-child(13) button { font-size:11px; }
+            #tabela-pagamentos tr[data-grupo] td:nth-child(2) { border-left:3px solid #94a9b8!important; }
+            main > div { text-align:left!important; border-top:0!important; border:1px solid #e1e7ee; border-color:#e1e7ee!important; border-radius:12px!important; padding:20px!important; }
+            main > div p:first-child { font-size:11px!important; letter-spacing:.7px; color:#64748b!important; }
+            #dashboard-total { color:#18364e!important; font-size:28px!important; font-variant-numeric:tabular-nums; }
+            #data-pagamento-global { border:1px solid #d7e0e9!important; background:transparent!important; padding:8px!important; }
+            .filtro-input { border-color:#d7e0e9; padding:8px 10px; background:transparent; }
+            .tabela-fixa th { background:#eff3f7!important; color:#526277; font-size:11px; font-weight:600; box-shadow:none; white-space:nowrap; }
+            td { border-color:#e8edf3!important; font-size:12px; }
+            .valor-texto { font-variant-numeric:tabular-nums; font-weight:600; }
+            .select-banco { border:1px solid #d7e0e9; background:#f1f5f9!important; color:#334155!important; font-size:12px; }
+            #aba-resumo > section { background:#e9eef4!important; border:1px solid #d7e0e9; }
+            #aba-resumo > section > h2 { color:#526277!important; }
+            #aba-resumo > section button { background:#edf2f7!important; color:#334155!important; border:1px solid #d7e0e9; }
+            #aba-distribuicao section button { font-size:12px; box-shadow:none!important; }
+            #tabela-pagamentos tr { background:white!important; }
+            #tabela-pagamentos tr:hover { background:#f6f9fc!important; }
+            #tabela-pagamentos tr.linha-imposto { color:#64748b; }
+            button:focus-visible, input:focus-visible, select:focus-visible, label:focus-within { outline:2px solid #3b82f6; outline-offset:2px; }
+            .operation-status { margin:12px 0; padding:12px 16px; background:#eef4f8; border:1px solid #dbe6ef; border-radius:9px; font-size:13px; color:#334155; }
+            .operation-status[data-kind="error"] { background:#fff1f2; color:#9f1239; border-color:#fecdd3; }
+            .operation-status[data-kind="success"] { background:#ecfdf5; color:#166534; border-color:#bbf7d0; }
+            body.dark-mode header, body.dark-mode main>div { border-color:#374151!important; }
+            body.dark-mode #aba-distribuicao > section > div:first-child { background:#273449!important; color:#cbd5e1!important; border-color:#374151; }
+            body.dark-mode #aba-distribuicao > section > div:first-child button { background:#334155!important; color:#cbd5e1!important; border-color:#475569!important; }
+            body.dark-mode #tabela-pagamentos tr { background:#1f2937!important; }
+            body.dark-mode #tabela-pagamentos tr:hover { background:#273449!important; }
+            body.dark-mode .tabela-fixa th { background:#273449!important; color:#cbd5e1; }
+            body.dark-mode #dashboard-total { color:#dbeafe!important; }
+            body.dark-mode #aba-resumo > section { background:#172033!important; border-color:#374151; }
+            body.dark-mode #aba-resumo > section > h2 { color:#cbd5e1!important; }
+            body.dark-mode #aba-resumo > section button { background:#273449!important; color:#e2e8f0!important; border-color:#475569; }
+            body.dark-mode nav { background:#273449; }
+            body.dark-mode nav button.bg-gray-300 { color:#cbd5e1!important; }
+            body.dark-mode header button, body.dark-mode header label { background:#273449!important; color:#e2e8f0!important; border-color:#475569; }
+            body.dark-mode .select-banco { background:#273449!important; color:#e2e8f0!important; }
+            @media(max-width:720px) { #body-main { padding:12px; } main { grid-template-columns:1fr!important; } header { align-items:flex-start!important; } }
+        }
     </style>
 </head>
 <body class="bg-gray-100 p-4 sm:p-5" id="body-main">
 
     <!-- DROP OVERLAY -->
     <div id="drop-overlay">
-        <span style="font-size:3rem;">📂</span>
+        <span style="font-size:3rem;"></span>
         <span style="font-size:1.3rem; margin-top:10px;">Solte os PDFs aqui para importar</span>
     </div>
 
+    <div class="brand-bar"><div class="brand-mark" aria-hidden="true">SP</div><div><div class="brand-name">SmartPag</div><div class="brand-caption">Gestão de pagamentos · Distribuição e conciliação</div></div></div>
     <!-- NAV -->
     <nav class="flex gap-3 mb-4 items-center flex-wrap">
         <button onclick="alternarAba('distribuicao')" id="btn-distribuicao"
             class="bg-indigo-900 text-white px-5 py-2 rounded shadow font-bold transition flex items-center gap-2">
-            📦 Distribuição de Caixa
+            Distribuição
         </button>
         <button onclick="alternarAba('resumo')" id="btn-resumo"
             class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded shadow font-bold transition flex items-center gap-2">
-            📊 Resumo &amp; Fitas Bancárias
+            Resumo por banco
         </button>
         <button onclick="alternarAba('conciliacao')" id="btn-conciliacao"
             class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-5 py-2 rounded shadow font-bold transition flex items-center gap-2">
-            🔄 Conciliação Diária (Rede Local)
+            Conciliação diária
         </button>
         <div class="ml-auto">
             <button onclick="alternarModoEscuro()" id="btn-dark"
                 class="bg-gray-700 hover:bg-gray-600 text-white px-3 py-2 rounded shadow font-bold transition"
-                title="Alternar Modo Escuro">🌙</button>
+                aria-label="Alternar modo escuro" title="Alternar Modo Escuro">Tema escuro</button>
         </div>
     </nav>
 
@@ -188,38 +253,39 @@
         <header class="flex justify-between items-center bg-white p-4 rounded shadow mb-4 border-t-8 border-green-700">
             <div>
                 <h1 class="text-2xl font-bold text-gray-800">SmartPag</h1>
-                <p class="text-sm text-gray-500">Sistema Offline Seguro (Salva na sua Rede)</p>
+                <p class="text-sm text-gray-500">Importe, confira e distribua os pagamentos do JDE</p>
             </div>
             <div class="flex gap-2 flex-wrap justify-end">
                 <button onclick="abrirModalRegras()"
                     class="bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded font-bold transition flex items-center gap-2 shadow"
                     title="Configurar regras de banco automático">
-                    ⚙️ Regras de Banco
+                    Regras de Banco
                 </button>
                 <button onclick="limparRascunhoManual()"
                     class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded font-bold transition flex items-center gap-2 shadow">
-                    🧹 Limpar Tabela
+                    Limpar Tabela
                 </button>
                 <label class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-bold cursor-pointer transition flex items-center gap-2 shadow-lg">
-                    📥 Importar PDF(s)
+                    Importar PDF(s)
                     <input type="file" id="upload-pdf" accept=".pdf" class="hidden" multiple onchange="processarPDF(event)">
                 </label>
                 <button onclick="exportarExcel()"
                     class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded font-bold transition flex items-center gap-2 shadow">
-                    📊 Excel
+                    Excel
                 </button>
                 <button onclick="gerarRelatorioPDF()"
                     class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded font-bold transition flex items-center gap-2 shadow">
-                    📋 Relatório por Banco
+                    Relatório por Banco
                 </button>
                 <button onclick="salvarBancoLocal()" id="btn-salvar"
                     class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold transition flex items-center gap-2 shadow-lg">
-                    💾 Salvar Banco
+                    Exportar lote JSON
                     <span id="badge-pendentes" class="badge-pendente hidden">0</span>
                 </button>
             </div>
         </header>
 
+        <div id="status-operacao" class="operation-status" role="status" aria-live="polite">Importe um relatório para conferir os totais antes de distribuir os pagamentos.</div>
         <!-- DASHBOARD -->
         <main class="grid grid-cols-3 gap-4 mb-4">
             <div class="bg-white p-4 rounded shadow text-center border-t-4 border-gray-300">
@@ -227,20 +293,20 @@
                 <p class="text-2xl text-blue-600 font-bold" id="dashboard-total">R$ 0,00</p>
             </div>
             <div class="bg-white p-4 rounded shadow text-center border-t-4 border-gray-300">
-                <p class="text-sm text-gray-500 font-bold">PAGAMENTOS NA TELA</p>
+                <p class="text-sm text-gray-500 font-bold">ITENS NA TABELA</p>
                 <p class="text-2xl text-gray-800 font-bold" id="dashboard-qtd">0</p>
             </div>
             <div class="bg-white p-4 rounded shadow text-center border-t-4 border-green-600 flex flex-col justify-center items-center">
                 <p class="text-sm text-gray-500 font-bold mb-1">DATA DE PAGAMENTO DO LOTE</p>
-                <input type="date" id="data-pagamento-global" onchange="salvarEstadoLocal()"
+                <input type="date" id="data-pagamento-global" onchange="calcularTotais()"
                     class="border-2 border-green-600 rounded p-1 font-bold text-center text-gray-700 outline-none cursor-pointer bg-green-50">
             </div>
         </main>
 
         <!-- FILTROS -->
         <div class="bg-white p-3 rounded shadow mb-2 flex flex-wrap gap-2 items-center border-l-4 border-indigo-400">
-            <span class="font-bold text-gray-600 text-sm">🔍 Filtros:</span>
-            <input type="text" id="filtro-texto" placeholder="Fornecedor, Voucher ou Fatura..."
+            <span class="font-bold text-gray-600 text-sm">Filtros:</span>
+            <input type="text" id="filtro-texto" aria-label="Buscar fornecedor, voucher ou fatura" placeholder="Fornecedor, voucher ou fatura..."
                 oninput="filtrarTabela()"
                 class="filtro-input flex-1 min-w-[200px]">
             <select id="filtro-banco" onchange="filtrarTabela()" class="filtro-input">
@@ -279,6 +345,7 @@
             </button>
         </div>
 
+        <p id="escopo-tabela" class="text-xs text-gray-500 mb-2">Cards e totais consideram o lote completo.</p>
         <!-- TABELA -->
         <section class="bg-white rounded shadow mb-6 border-t-4 border-indigo-900 overflow-hidden">
             <div class="bg-indigo-900 text-white p-3 flex flex-wrap justify-between items-center font-bold gap-4">
@@ -290,7 +357,7 @@
                     </button>
                     <button onclick="consolidarAutomatico()"
                         class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded shadow transition flex items-center gap-2 border border-purple-500">
-                        🤖 Consolidar Automático
+                        Consolidar por voucher
                     </button>
                     <button onclick="desagruparSelecionados()"
                         class="bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded shadow transition border border-red-400">
@@ -340,11 +407,11 @@
             <div class="flex gap-2 flex-wrap">
                 <button onclick="gerarRelatorioPDF()"
                     class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded font-bold transition flex items-center gap-2 shadow">
-                    📋 Imprimir Relatório PDF
+                    Imprimir Relatório PDF
                 </button>
                 <button onclick="exportarExcel()"
                     class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded font-bold transition flex items-center gap-2 shadow">
-                    📊 Exportar Excel
+                    Exportar Excel
                 </button>
             </div>
         </header>
@@ -407,7 +474,7 @@
                         </div>
                         <div id="detalhes-itau" class="detalhes-impressao mt-3 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
                     </div>
-                    <button onclick="imprimirFita('itau')" class="mt-4 bg-green-600 hover:bg-green-700 text-white w-full py-2 rounded text-xs font-bold transition">🖨️ IMPRIMIR ITAÚ</button>
+                    <button onclick="imprimirFita('itau')" class="mt-4 bg-green-600 hover:bg-green-700 text-white w-full py-2 rounded text-xs font-bold transition">Imprimir ITAÚ</button>
                 </div>
                 <!-- SANTANDER -->
                 <div class="bg-white p-4 rounded-lg shadow flex flex-col justify-between">
@@ -423,7 +490,7 @@
                         </div>
                         <div id="detalhes-santander" class="detalhes-impressao mt-3 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
                     </div>
-                    <button onclick="imprimirFita('santander')" class="mt-4 bg-[#ccff00] hover:bg-yellow-400 text-black w-full py-2 rounded text-xs font-bold transition">🖨️ IMPRIMIR SANTANDER</button>
+                    <button onclick="imprimirFita('santander')" class="mt-4 bg-[#ccff00] hover:bg-yellow-400 text-black w-full py-2 rounded text-xs font-bold transition">Imprimir SANTANDER</button>
                 </div>
                 <!-- BRADESCO -->
                 <div class="bg-white p-4 rounded-lg shadow flex flex-col justify-between">
@@ -439,7 +506,7 @@
                         </div>
                         <div id="detalhes-bradesco" class="detalhes-impressao mt-3 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
                     </div>
-                    <button onclick="imprimirFita('bradesco')" class="mt-4 bg-orange-600 hover:bg-orange-700 text-white w-full py-2 rounded text-xs font-bold transition">🖨️ IMPRIMIR BRADESCO</button>
+                    <button onclick="imprimirFita('bradesco')" class="mt-4 bg-orange-600 hover:bg-orange-700 text-white w-full py-2 rounded text-xs font-bold transition">Imprimir BRADESCO</button>
                 </div>
                 <!-- CAIXA -->
                 <div class="bg-white p-4 rounded-lg shadow flex flex-col justify-between">
@@ -455,7 +522,7 @@
                         </div>
                         <div id="detalhes-caixa" class="detalhes-impressao mt-3 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
                     </div>
-                    <button onclick="imprimirFita('caixa')" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded text-xs font-bold transition">🖨️ IMPRIMIR CAIXA</button>
+                    <button onclick="imprimirFita('caixa')" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white w-full py-2 rounded text-xs font-bold transition">Imprimir CAIXA</button>
                 </div>
                 <!-- BRASIL -->
                 <div class="bg-white p-4 rounded-lg shadow flex flex-col justify-between">
@@ -471,7 +538,7 @@
                         </div>
                         <div id="detalhes-brasil" class="detalhes-impressao mt-3 w-full text-left text-[10px] text-gray-800 border-t border-black pt-2 font-mono"></div>
                     </div>
-                    <button onclick="imprimirFita('brasil')" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white w-full py-2 rounded text-xs font-bold transition">🖨️ IMPRIMIR BRASIL</button>
+                    <button onclick="imprimirFita('brasil')" class="mt-4 bg-pink-500 hover:bg-pink-600 text-white w-full py-2 rounded text-xs font-bold transition">Imprimir BRASIL</button>
                 </div>
             </div>
         </section>
@@ -494,7 +561,7 @@
                         class="bg-transparent border-none outline-none text-sm font-semibold text-gray-700 min-w-[140px]">
                 </div>
                 <label class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded font-bold cursor-pointer transition flex items-center gap-2 shadow">
-                    📂 Carregar Arquivo da Rede
+                    Carregar Arquivo da Rede
                     <input type="file" id="upload-db" accept=".json" class="hidden" onchange="importarBancoLocal(event)">
                 </label>
                 <button onclick="salvarBancoAtualizado()"
@@ -535,7 +602,7 @@
     <div id="modal-regras" class="modal-overlay hidden" onclick="fecharModalFora(event)">
         <div class="modal-box">
             <div class="flex justify-between items-center mb-5 border-b pb-3">
-                <h2 class="text-xl font-bold text-indigo-900">⚙️ Regras de Banco Automático</h2>
+                <h2 class="text-xl font-bold text-indigo-900">Regras de Banco Automático</h2>
                 <button onclick="fecharModalRegras()" class="text-gray-400 hover:text-red-600 text-3xl font-bold leading-none">×</button>
             </div>
 
@@ -600,14 +667,14 @@
             const btn  = document.getElementById('btn-dark');
             body.classList.toggle('dark-mode');
             const dark = body.classList.contains('dark-mode');
-            btn.textContent = dark ? '☀️' : '🌙';
+            btn.textContent = dark ? 'Tema claro' : 'Tema escuro';
             localStorage.setItem('smartpag_darkmode', dark ? '1' : '0');
         }
 
         function aplicarModoEscuroSalvo() {
             if (localStorage.getItem('smartpag_darkmode') === '1') {
                 document.getElementById('body-main').classList.add('dark-mode');
-                document.getElementById('btn-dark').textContent = '☀️';
+                document.getElementById('btn-dark').textContent = 'Tema claro';
             }
         }
 
@@ -718,7 +785,7 @@
             const div = document.createElement('div');
             div.className = 'regra-forn-row flex items-center gap-2';
             div.innerHTML = `
-                <input type="text" placeholder="Cód. Fornecedor" class="regra-forn-cod border rounded p-1 text-sm w-36 outline-none" value="${cod}">
+                <input type="text" placeholder="Cód. Fornecedor" class="regra-forn-cod border rounded p-1 text-sm w-36 outline-none" value="${escaparHTML(cod)}">
                 <span class="text-gray-400 font-bold">→</span>
                 <select class="regra-forn-banco border rounded p-1 text-sm flex-1 outline-none">
                     <option value="">-- Banco --</option>
@@ -760,6 +827,9 @@
 
                 linha.style.display = (matchTexto && matchBanco && matchClassif && matchTipo) ? '' : 'none';
             });
+            const linhas = Array.from(document.querySelectorAll('#tabela-pagamentos tr'));
+            const visiveis = linhas.filter(l=>l.style.display !== 'none').length;
+            document.getElementById('escopo-tabela').textContent = `${visiveis} de ${linhas.length} itens visíveis · Cards e totais consideram o lote completo`;
         }
 
         function limparFiltros() {
@@ -790,7 +860,7 @@
                 const colunas = linha.querySelectorAll('td');
                 if (colunas.length === 0) return;
                 dadosSalvos.push({
-                    fornecedorHTML:  colunas[1].innerHTML,
+                    fornecedorHTML:  colunas[1].innerText,
                     voucher:         colunas[2].innerText,
                     fatura:          colunas[3].innerText,
                     vencimento:      colunas[4].innerText,
@@ -803,6 +873,7 @@
                     classificacao:   linha.querySelector('.select-classificacao').value,
                     banco:           linha.querySelector('.select-banco').value,
                     observacao:      linha.querySelector('.obs-input')?.value || '',
+                    chaveJDE:        linha.getAttribute('data-chave-jde') || null,
                     grupoId:         linha.getAttribute('data-grupo') || null
                 });
             });
@@ -814,7 +885,7 @@
         function carregarEstadoLocal() {
             const dataPag = localStorage.getItem('smartpag_data_pagamento');
             document.getElementById('data-pagamento-global').value =
-                dataPag || new Date().toISOString().split('T')[0];
+                dataPag || dataLocalISO();
 
             const contadorStr = localStorage.getItem('smartpag_contador');
             if (contadorStr) contadorGrupo = parseInt(contadorStr);
@@ -832,6 +903,11 @@
                     dado.valor, dado.codBeneficiario, dado.tipoDocumento, dado.codFornecedor,
                     dado.observacao || '', dado.valorOriginal, dado.ajuste
                 );
+                if (dado.chaveJDE) {
+                    novaTr.setAttribute('data-chave-jde', dado.chaveJDE);
+                    const origem=JSON.parse(dado.chaveJDE);
+                    novaTr.querySelectorAll('td')[2].title=`Companhia ${origem[3]} · Item ${origem[4]}`;
+                }
                 if (dado.grupoId) novaTr.setAttribute('data-grupo', dado.grupoId);
                 tbody.appendChild(novaTr);
 
@@ -876,7 +952,7 @@
                 if (!ok) return;
             }
 
-            const dataArquivo = new Date().toISOString().split('T')[0];
+            const dataArquivo = dataLocalISO();
             const pacotes = linhasComBanco.map(linha => {
                 const colunas = linha.querySelectorAll('td');
                 return {
@@ -888,6 +964,13 @@
                     classificacao:   linha.querySelector('.select-classificacao').value,
                     bancoSelecionado: linha.querySelector('.select-banco').value,
                     observacao:      linha.querySelector('.obs-input')?.value || '',
+                    codBeneficiario: colunas[6].innerText,
+                    tipoDocumento:   colunas[7].innerText,
+                    codFornecedor:   colunas[8].innerText,
+                    chaveJDE:        linha.getAttribute('data-chave-jde'),
+                    grupoId:         linha.getAttribute('data-grupo'),
+                    valorOriginal:   linha.getAttribute('data-valor-original'),
+                    ajuste:          linha.getAttribute('data-ajuste') || '',
                     status:          "Pendente",
                     dataPagamento:   dataPagamentoFormatada
                 };
@@ -900,11 +983,34 @@
             document.body.appendChild(a); a.click();
             document.body.removeChild(a); URL.revokeObjectURL(url);
 
-            linhasComBanco.forEach(l => l.remove());
-            localStorage.removeItem('smartpag_tabela');
-            localStorage.removeItem('smartpag_contador');
-            calcularTotais();
+            // O download pode ser cancelado: manter o rascunho até limpeza explícita.
+            salvarEstadoLocal();
             alert(`${pacotes.length} pagamentos exportados com data de pagamento ${dataPagamentoFormatada}.\nSalve o arquivo na rede!`);
+        }
+
+        function validarConciliacao(dados) {
+            if (!Array.isArray(dados)) throw new Error('O arquivo deve conter uma lista de pagamentos.');
+            return dados.map(d => {
+                if (!d || typeof d !== 'object' || typeof d.fornecedor !== 'string' ||
+                    typeof d.voucher !== 'string' || !BANCOS_NOMES.includes(d.bancoSelecionado) ||
+                    !['Pendente', 'Conciliado'].includes(d.status)) {
+                    throw new Error('Pagamento com campos ou status inválidos.');
+                }
+                valorEmCentavos(d.valor);
+                return {...d};
+            });
+        }
+
+        function salvarConciliacao(dados) {
+            localStorage.setItem('smartpag_conciliacao', JSON.stringify(dados));
+        }
+
+        function carregarConciliacao() {
+            try {
+                const salvo = localStorage.getItem('smartpag_conciliacao');
+                if (salvo) bancoDeDadosConciliacao = validarConciliacao(JSON.parse(salvo));
+                renderizarConciliacao();
+            } catch (err) { alert('Não foi possível recuperar a conciliação salva. Os dados foram preservados.'); }
         }
 
         function importarBancoLocal(evento) {
@@ -913,7 +1019,10 @@
             const leitor = new FileReader();
             leitor.onload = function(e) {
                 try {
-                    bancoDeDadosConciliacao = JSON.parse(e.target.result);
+                    const dados = validarConciliacao(JSON.parse(e.target.result));
+                    if (bancoDeDadosConciliacao.length && !confirm('Substituir a conciliação atual pelo arquivo selecionado?')) return;
+                    salvarConciliacao(dados);
+                    bancoDeDadosConciliacao = dados;
                     renderizarConciliacao();
                     alert("Arquivo importado com sucesso!");
                 } catch(err) {
@@ -931,17 +1040,17 @@
 
             bancoDeDadosConciliacao.forEach((dados, index) => {
                 const tr = document.createElement('tr');
-                if (dados.status === "Pendente") {
+                if (dados.status !== "Conciliado") {
                     temPendentes = true;
                     tr.className = "border-b hover:bg-gray-50 transition-colors";
                     tr.innerHTML = `
-                        <td class="px-4 py-2 border font-bold text-green-700">${dados.dataPagamento || '-'}</td>
-                        <td class="px-4 py-2 border font-bold">${dados.fornecedor}</td>
-                        <td class="px-4 py-2 border">${dados.voucher}</td>
-                        <td class="px-4 py-2 border">${dados.vencimento || '-'}</td>
-                        <td class="px-4 py-2 border font-mono text-right">${dados.valor}</td>
-                        <td class="px-4 py-2 border text-xs text-gray-500 italic">${dados.observacao || '-'}</td>
-                        <td class="px-4 py-2 border uppercase font-medium">${dados.bancoSelecionado}</td>
+                        <td class="px-4 py-2 border font-bold text-green-700">${escaparHTML(dados.dataPagamento || '-')}</td>
+                        <td class="px-4 py-2 border font-bold">${escaparHTML(dados.fornecedor)}</td>
+                        <td class="px-4 py-2 border">${escaparHTML(dados.voucher)}</td>
+                        <td class="px-4 py-2 border">${escaparHTML(dados.vencimento || '-')}</td>
+                        <td class="px-4 py-2 border font-mono text-right">${escaparHTML(dados.valor)}</td>
+                        <td class="px-4 py-2 border text-xs text-gray-500 italic">${escaparHTML(dados.observacao || '-')}</td>
+                        <td class="px-4 py-2 border uppercase font-medium">${escaparHTML(dados.bancoSelecionado)}</td>
                         <td class="px-4 py-2 border text-red-600 font-bold">⏳ Pendente</td>
                         <td class="px-4 py-2 border text-gray-400 text-xs">—</td>
                         <td class="px-4 py-2 border text-center">
@@ -953,17 +1062,17 @@
                 } else {
                     tr.className = "border-b bg-green-50 opacity-75";
                     tr.innerHTML = `
-                        <td class="px-4 py-2 border text-gray-500">${dados.dataPagamento || '-'}</td>
-                        <td class="px-4 py-2 border text-gray-500">${dados.fornecedor}</td>
-                        <td class="px-4 py-2 border text-gray-500">${dados.voucher}</td>
-                        <td class="px-4 py-2 border text-gray-500">${dados.vencimento || '-'}</td>
-                        <td class="px-4 py-2 border font-mono text-right text-gray-500">${dados.valor}</td>
-                        <td class="px-4 py-2 border text-xs text-gray-400 italic">${dados.observacao || '-'}</td>
-                        <td class="px-4 py-2 border uppercase text-gray-500">${dados.bancoSelecionado}</td>
+                        <td class="px-4 py-2 border text-gray-500">${escaparHTML(dados.dataPagamento || '-')}</td>
+                        <td class="px-4 py-2 border text-gray-500">${escaparHTML(dados.fornecedor)}</td>
+                        <td class="px-4 py-2 border text-gray-500">${escaparHTML(dados.voucher)}</td>
+                        <td class="px-4 py-2 border text-gray-500">${escaparHTML(dados.vencimento || '-')}</td>
+                        <td class="px-4 py-2 border font-mono text-right text-gray-500">${escaparHTML(dados.valor)}</td>
+                        <td class="px-4 py-2 border text-xs text-gray-400 italic">${escaparHTML(dados.observacao || '-')}</td>
+                        <td class="px-4 py-2 border uppercase text-gray-500">${escaparHTML(dados.bancoSelecionado)}</td>
                         <td class="px-4 py-2 border text-green-700 font-bold">✅ Conciliado</td>
                         <td class="px-4 py-2 border text-xs text-gray-600">
-                            <span class="font-semibold">${dados.responsavelBaixa || '-'}</span><br>
-                            <span class="text-gray-400">${dados.dataBaixa || ''}</span>
+                            <span class="font-semibold">${escaparHTML(dados.responsavelBaixa || '-')}</span><br>
+                            <span class="text-gray-400">${escaparHTML(dados.dataBaixa || '')}</span>
                         </td>
                         <td class="px-4 py-2 border text-center text-gray-300 text-lg">—</td>`;
                 }
@@ -971,21 +1080,24 @@
             });
 
             if (!temPendentes) {
-                tbody.innerHTML += `<tr><td colspan="10" class="text-center py-6 font-bold text-green-600">🎉 Todos os pagamentos conciliados!</td></tr>`;
+                tbody.innerHTML += `<tr><td colspan="10" class="text-center py-6 font-bold text-green-600">Todos os pagamentos conciliados!</td></tr>`;
             }
         }
 
         function darBaixaConciliacao(index) {
             const responsavel = localStorage.getItem('smartpag_responsavel') || 'Não identificado';
+            const anteriores = bancoDeDadosConciliacao.map(d => ({...d}));
             bancoDeDadosConciliacao[index].status           = "Conciliado";
             bancoDeDadosConciliacao[index].responsavelBaixa = responsavel;
             bancoDeDadosConciliacao[index].dataBaixa        = new Date().toLocaleString('pt-BR');
+            try { salvarConciliacao(bancoDeDadosConciliacao); }
+            catch (err) { bancoDeDadosConciliacao = anteriores; alert('Baixa não salva: ' + err.message); }
             renderizarConciliacao();
         }
 
         function salvarBancoAtualizado() {
             if (bancoDeDadosConciliacao.length === 0) { alert("Nenhum dado importado para salvar."); return; }
-            const dataArquivo = new Date().toISOString().split('T')[0];
+            const dataArquivo = dataLocalISO();
             const blob = new Blob([JSON.stringify(bancoDeDadosConciliacao, null, 2)], { type: "application/json" });
             const url  = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1031,7 +1143,7 @@
                 {wch:12},{wch:8},{wch:12},{wch:16},{wch:12},{wch:24}
             ];
             XLSX.utils.book_append_sheet(wb, ws, "Pagamentos");
-            XLSX.writeFile(wb, `SmartPag_${new Date().toISOString().split('T')[0]}.xlsx`);
+            XLSX.writeFile(wb, `SmartPag_${dataLocalISO()}.xlsx`);
         }
 
         // ==========================================
@@ -1051,11 +1163,12 @@
             // Calcula soma dos grupos
             let somaGrupos = {};
             linhas.forEach(linha => {
+                if (linha.style.display === 'none') return;
                 const grupoId = linha.getAttribute('data-grupo');
                 if (grupoId) {
                     const val = textoParaNumero(linha.querySelector('.valor-texto').innerText);
                     if (!somaGrupos[grupoId]) somaGrupos[grupoId] = { valor: 0 };
-                    somaGrupos[grupoId].valor += val;
+                    somaGrupos[grupoId].valor = somarMoeda(somaGrupos[grupoId].valor, val);
                 }
             });
 
@@ -1078,16 +1191,16 @@
                 if (grupoId) {
                     if (!gruposProcessados[grupoId]) {
                         const vg = somaGrupos[grupoId].valor;
-                        dadosBancos[banco].classificacoes[classif].total += vg;
+                        dadosBancos[banco].classificacoes[classif].total = somarMoeda(dadosBancos[banco].classificacoes[classif].total, vg);
                         dadosBancos[banco].classificacoes[classif].qtd   += 1;
-                        dadosBancos[banco].total += vg;
+                        dadosBancos[banco].total = somarMoeda(dadosBancos[banco].total, vg);
                         dadosBancos[banco].qtd   += 1;
                         gruposProcessados[grupoId] = true;
                     }
                 } else {
-                    dadosBancos[banco].classificacoes[classif].total += valor;
+                    dadosBancos[banco].classificacoes[classif].total = somarMoeda(dadosBancos[banco].classificacoes[classif].total, valor);
                     dadosBancos[banco].classificacoes[classif].qtd   += 1;
-                    dadosBancos[banco].total += valor;
+                    dadosBancos[banco].total = somarMoeda(dadosBancos[banco].total, valor);
                     dadosBancos[banco].qtd   += 1;
                 }
             });
@@ -1106,13 +1219,13 @@
             BANCOS_NOMES.forEach(banco => {
                 const d = dadosBancos[banco];
                 if (d.qtd === 0) return;
-                totalGeral += d.total;
+                totalGeral = somarMoeda(totalGeral, d.total);
                 qtdGeral   += d.qtd;
 
                 html += `
                 <div style="margin-bottom:18px; border:1px solid #e5e7eb; border-radius:10px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                     <div style="background:${BANCOS_COR[banco]}; color:white; padding:10px 18px; display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:15px; font-weight:bold;">🏦 ${BANCOS_LABEL[banco].toUpperCase()}</span>
+                        <span style="font-size:15px; font-weight:bold;">${BANCOS_LABEL[banco].toUpperCase()}</span>
                         <span style="font-size:12px; opacity:0.9;">${d.qtd} pagamento(s)</span>
                     </div>
                     <table style="width:100%; border-collapse:collapse;">
@@ -1150,7 +1263,7 @@
             html += `
                 <div style="background:#312e81; color:white; border-radius:10px; padding:14px 20px;
                     display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-                    <span style="font-size:15px; font-weight:bold;">💰 TOTAL GERAL</span>
+                    <span style="font-size:15px; font-weight:bold;">TOTAL GERAL</span>
                     <span style="font-size:17px; font-weight:bold; font-family:monospace;">
                         R$ ${formatarMoeda(totalGeral)} &nbsp;(${qtdGeral} pagamentos)
                     </span>
@@ -1171,12 +1284,36 @@
         // ==========================================
         // TABELA — OPERAÇÕES
         // ==========================================
+        function escaparHTML(valor) {
+            return String(valor ?? '').replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+
+        function valorEmCentavos(texto) {
+            const raw = String(texto ?? '').trim();
+            if (!/^-?(?:\d{1,3}(?:\.\d{3})+|\d*),\d{2}-?$/.test(raw) ||
+                (raw.startsWith('-') && raw.endsWith('-'))) {
+                throw new Error('Valor inválido: use o formato 1.500,00.');
+            }
+            const negativo = raw.startsWith('-') || raw.endsWith('-');
+            const digitos = raw.replace(/[-.,]/g, '');
+            const cents = Number(digitos);
+            if (!Number.isSafeInteger(cents)) throw new Error('Valor fora do limite permitido.');
+            return negativo ? -cents : cents;
+        }
+
         function textoParaNumero(texto) {
-            if (!texto) return 0;
-            let limpo = texto.replace(/\./g, '').replace(',', '.').replace('-', '');
-            let num = parseFloat(limpo) || 0;
-            if (texto.includes('-')) num = -num;
-            return num;
+            return valorEmCentavos(texto) / 100;
+        }
+
+        function dataLocalISO() {
+            const agora = new Date();
+            return `${agora.getFullYear()}-${String(agora.getMonth()+1).padStart(2,'0')}-${String(agora.getDate()).padStart(2,'0')}`;
+        }
+
+        function somarMoeda(a, b) {
+            return (Math.round(a * 100) + Math.round(b * 100)) / 100;
         }
 
         function formatarMoeda(valor) {
@@ -1185,13 +1322,16 @@
 
         function editarValor(botao) {
             const linha = botao.closest('tr');
-            const spanTexto = botao.previousElementSibling;
+            const spanTexto = linha.querySelector('.valor-texto');
             const valorAtual = spanTexto.innerText;
             const valOrig = linha.getAttribute('data-valor-original') || valorAtual;
 
             const novoValor = prompt("Digite o novo valor (Ex: 1.500,00):", valorAtual);
             if (novoValor !== null && novoValor.trim() !== "") {
-                spanTexto.innerText = novoValor;
+                let valorValidado;
+                try { valorValidado = valorEmCentavos(novoValor); }
+                catch (err) { alert(err.message); return; }
+                spanTexto.innerText = formatarMoeda(valorValidado / 100);
                 const nOrig = textoParaNumero(valOrig);
                 const nNovo = textoParaNumero(novoValor);
                 const diff = Math.round((nNovo - nOrig) * 100) / 100;
@@ -1216,6 +1356,7 @@
                     if (badge) badge.remove();
                 }
                 calcularTotais();
+                informarOperacao('Valor alterado manualmente. Confira os ajustes antes de exportar o lote.');
             }
         }
 
@@ -1223,14 +1364,23 @@
             if (confirm("Tem certeza que deseja excluir este pagamento?")) {
                 botao.closest('tr').remove();
                 calcularTotais();
+                informarOperacao('Item removido manualmente. Confira o total do lote antes de exportar.');
             }
         }
 
         function criarLinhaTR(fornecedorHTML, voucher, fatura, vencimento, valor,
                                codBeneficiario, tipoDocumento, codFornecedor, observacao, valorOriginal, ajuste) {
-            const obs = (observacao || '').replace(/"/g, '&quot;');
+            fornecedorHTML = escaparHTML(fornecedorHTML);
+            voucher = escaparHTML(voucher);
+            fatura = escaparHTML(fatura);
+            vencimento = escaparHTML(vencimento);
+            codBeneficiario = escaparHTML(codBeneficiario);
+            tipoDocumento = escaparHTML(tipoDocumento);
+            codFornecedor = escaparHTML(codFornecedor);
+            const obs = escaparHTML(observacao);
             const vOrig = valorOriginal || valor;
-            const aj = ajuste || '';
+            valor = formatarMoeda(textoParaNumero(valor));
+            const aj = escaparHTML(ajuste);
             const badgeAjusteHtml = aj ? `<span class="badge-ajuste text-[10px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded ml-1" title="${aj}">✏️ ${aj.replace('tem ajuste de ', '')}</span>` : '';
 
             const novaTr = document.createElement('tr');
@@ -1245,9 +1395,9 @@
                 <td class="px-3 py-2 border">${fatura}</td>
                 <td class="px-3 py-2 border">${vencimento}</td>
                 <td class="px-3 py-2 border font-mono text-right flex justify-end items-center gap-2">
-                    <span class="valor-texto">${valor}</span>
+                    <span class="valor-texto">${escaparHTML(valor)}</span>
                     ${badgeAjusteHtml}
-                    <button onclick="editarValor(this)" class="text-gray-400 hover:text-blue-600 cursor-pointer text-base" title="Alterar Valor">✏️</button>
+                    <button onclick="editarValor(this)" class="text-gray-400 hover:text-blue-600 cursor-pointer text-base" title="Alterar Valor">Editar</button>
                 </td>
                 <td class="px-3 py-2 border text-center">${codBeneficiario || '-'}</td>
                 <td class="px-3 py-2 border text-center">${tipoDocumento || '-'}</td>
@@ -1275,27 +1425,34 @@
                     <input type="text" class="obs-input" placeholder="Observação..." value="${obs}">
                 </td>
                 <td class="px-3 py-2 border text-center">
-                    <button onclick="excluirPagamento(this)" class="text-red-400 hover:text-red-700 cursor-pointer text-lg" title="Excluir">🗑️</button>
+                    <button onclick="excluirPagamento(this)" class="text-red-400 hover:text-red-700 cursor-pointer text-lg" title="Excluir">Excluir</button>
                 </td>`;
             return novaTr;
         }
 
-        function pagamentoJaExiste(voucher, valor) {
-            const v = voucher.trim(), vl = valor.trim();
-            for (let linha of document.querySelectorAll('#tabela-pagamentos tr')) {
-                const cv = linha.querySelectorAll('td')[2];
-                const cval = linha.querySelector('.valor-texto');
-                if (cv && cval && cv.innerText.trim() === v && cval.innerText.trim() === vl) return true;
-            }
-            return false;
+        function chaveLinhaJDE(codBeneficiario, tipoDocumento, voucher, cia, item, fatura, vencimento, valor) {
+            // Itens diferentes podem ter o mesmo voucher e valor (inclusive centavos).
+            return JSON.stringify([codBeneficiario, tipoDocumento, voucher, cia, item,
+                fatura, vencimento, Math.round(textoParaNumero(valor) * 100)]);
         }
 
-        function adicionarLinhaTabela(fornecedor, voucher, fatura, vencimento, valor, codBeneficiario, tipoDocumento, codFornecedor) {
-            if (pagamentoJaExiste(voucher, valor)) return false;
+        function pagamentoJaExiste(chaveJDE) {
+            if (!chaveJDE) return false;
+            return Array.from(document.querySelectorAll('#tabela-pagamentos tr'))
+                .some(linha => linha.getAttribute('data-chave-jde') === chaveJDE);
+        }
+
+        function adicionarLinhaTabela(fornecedor, voucher, fatura, vencimento, valor, codBeneficiario, tipoDocumento, codFornecedor, chaveJDE) {
+            if (pagamentoJaExiste(chaveJDE)) return false;
 
             const tbody = document.getElementById('tabela-pagamentos');
             const novaTr = criarLinhaTR(fornecedor, voucher, fatura, vencimento, valor,
                                          codBeneficiario, tipoDocumento, codFornecedor, '', valor, '');
+            if (chaveJDE) {
+                novaTr.setAttribute('data-chave-jde', chaveJDE);
+                const origem=JSON.parse(chaveJDE);
+                novaTr.querySelectorAll('td')[2].title=`Companhia ${origem[3]} · Item ${origem[4]}`;
+            }
             tbody.appendChild(novaTr);
 
             const sel = novaTr.querySelector('.select-banco');
@@ -1347,7 +1504,9 @@
                 const codBenef = cel[6].innerText.trim();
                 if (!voucher || !codBenef || codBenef === '-') return;
 
-                const chave = voucher + '|' + codBenef;
+                const origem = JSON.parse(linha.getAttribute('data-chave-jde') || 'null');
+                if (!origem) return; // Rascunhos antigos não têm identidade suficiente.
+                const chave = JSON.stringify([origem[0], origem[1], origem[2], origem[3]]);
                 if (!grupos[chave]) grupos[chave] = { nota: null, tributos: [] };
 
                 if (regexTributo.test(fatura)) grupos[chave].tributos.push(linha);
@@ -1410,11 +1569,22 @@
             });
         }
 
+        function expandirLinhasMarcadas(checkboxes) {
+            const linhas = new Set(checkboxes.map(cb=>cb.closest('tr')));
+            const grupos = new Set(Array.from(linhas).map(l=>l.getAttribute('data-grupo')).filter(Boolean));
+            document.querySelectorAll('#tabela-pagamentos tr').forEach(l=>{
+                if (grupos.has(l.getAttribute('data-grupo'))) linhas.add(l);
+            });
+            return Array.from(linhas);
+        }
+
         function atualizarCorDaLinha(selectElement, propagar = true) {
             const banco = selectElement.value;
             const linha = selectElement.closest('tr');
 
+            const eraImposto = linha.classList.contains('linha-imposto');
             linha.className = 'border-b hover:bg-gray-100 transition-colors duration-300';
+            if (eraImposto) linha.classList.add('linha-imposto');
             selectElement.className = 'select-banco rounded p-1 w-full text-center font-bold outline-none cursor-pointer transition-colors duration-300';
 
             if (banco === "") {
@@ -1431,8 +1601,7 @@
                 const checkboxesMarcados = Array.from(document.querySelectorAll('#tabela-pagamentos input[type="checkbox"]:checked'));
                 
                 if (checkboxLinha?.checked || checkboxesMarcados.length > 1) {
-                    checkboxesMarcados.forEach(cb => {
-                        const l = cb.closest('tr');
+                    expandirLinhasMarcadas(checkboxesMarcados).forEach(l => {
                         if (l && l !== linha) {
                             const s = l.querySelector('.select-banco');
                             if (s && s.value !== banco) {
@@ -1469,8 +1638,7 @@
             const checkboxLinha = linha.querySelector('input[type="checkbox"]');
             const checkboxesMarcados = Array.from(document.querySelectorAll('#tabela-pagamentos input[type="checkbox"]:checked'));
             if (checkboxLinha?.checked || checkboxesMarcados.length > 1) {
-                checkboxesMarcados.forEach(cb => {
-                    const l = cb.closest('tr');
+                expandirLinhasMarcadas(checkboxesMarcados).forEach(l => {
                     if (l && l !== linha) {
                         const sc = l.querySelector('.select-classificacao');
                         if (sc) sc.value = classif;
@@ -1497,14 +1665,14 @@
 
             let valorGeralNaTela = 0;
             const linhas = document.querySelectorAll('#tabela-pagamentos tr');
-            let somaGrupos = {}, gruposProcessados = {}, semBancoCount = 0;
+            let somaGrupos = {}, gruposProcessados = {}, gruposContados = new Set(), semBancoCount = 0;
 
             linhas.forEach(linha => {
                 const grupoId = linha.getAttribute('data-grupo');
                 if (grupoId) {
                     const v = textoParaNumero(linha.querySelector('.valor-texto').innerText);
                     if (!somaGrupos[grupoId]) somaGrupos[grupoId] = { valor: 0 };
-                    somaGrupos[grupoId].valor += v;
+                    somaGrupos[grupoId].valor = somarMoeda(somaGrupos[grupoId].valor, v);
                 }
                 if (!linha.querySelector('.select-banco')?.value) semBancoCount++;
             });
@@ -1521,26 +1689,28 @@
                 const celaVal = linha.querySelector('.valor-texto');
                 const valor   = textoParaNumero(celaVal.innerText);
                 const colunas = linha.querySelectorAll('td');
-                const nomeForn = colunas[1].innerText;
-                const numVouc  = colunas[2].innerText;
+                const nomeForn = escaparHTML(colunas[1].innerText);
+                const numVouc  = escaparHTML(colunas[2].innerText);
                 const classif  = linha.querySelector('.select-classificacao').value;
                 const grupoId  = linha.getAttribute('data-grupo');
 
-                valorGeralNaTela += (grupoId && !gruposProcessados[grupoId])
-                    ? somaGrupos[grupoId].valor
-                    : (!grupoId ? valor : 0);
+                if (!grupoId) valorGeralNaTela = somarMoeda(valorGeralNaTela, valor);
+                else if (!gruposContados.has(grupoId)) {
+                    valorGeralNaTela = somarMoeda(valorGeralNaTela, somaGrupos[grupoId].valor);
+                    gruposContados.add(grupoId);
+                }
 
                 if (banco !== "") {
                     if (!dadosBancos[banco].classificacoes[classif])
                         dadosBancos[banco].classificacoes[classif] = { total: 0, qtd: 0, htmlItens: '', fitaItens: '' };
 
-                    const ajLinha = linha.getAttribute('data-ajuste') || '';
+                    const ajLinha = escaparHTML(linha.getAttribute('data-ajuste') || '');
                     const ajTag = ajLinha ? ` <span style="color:#b45309; font-weight:bold; font-size:10px;">(${ajLinha})</span>` : '';
 
                     if (grupoId) {
                         if (!gruposProcessados[grupoId]) {
                             const vg = somaGrupos[grupoId].valor;
-                            dadosBancos[banco].classificacoes[classif].total    += vg;
+                            dadosBancos[banco].classificacoes[classif].total = somarMoeda(dadosBancos[banco].classificacoes[classif].total, vg);
                             dadosBancos[banco].classificacoes[classif].qtd      += 1;
                             dadosBancos[banco].classificacoes[classif].fitaItens += `<div class="fita-item-numero">${formatarMoeda(vg)} +</div>`;
                             dadosBancos[banco].classificacoes[classif].htmlItens +=
@@ -1548,12 +1718,12 @@
                                     <span class="truncate pr-2">${nomeForn} (Agrupado)${ajTag}</span>
                                     <span>${formatarMoeda(vg)}</span>
                                 </div>`;
-                            dadosBancos[banco].total += vg;
+                            dadosBancos[banco].total = somarMoeda(dadosBancos[banco].total, vg);
                             dadosBancos[banco].qtd   += 1;
                             gruposProcessados[grupoId] = true;
                         }
                     } else {
-                        dadosBancos[banco].classificacoes[classif].total    += valor;
+                        dadosBancos[banco].classificacoes[classif].total = somarMoeda(dadosBancos[banco].classificacoes[classif].total, valor);
                         dadosBancos[banco].classificacoes[classif].qtd      += 1;
                         dadosBancos[banco].classificacoes[classif].fitaItens += `<div class="fita-item-numero">${celaVal.innerText} +</div>`;
                         dadosBancos[banco].classificacoes[classif].htmlItens +=
@@ -1561,7 +1731,7 @@
                                 <span class="truncate pr-2">${nomeForn} (Voucher: ${numVouc})${ajTag}</span>
                                 <span>${celaVal.innerText}</span>
                             </div>`;
-                        dadosBancos[banco].total += valor;
+                        dadosBancos[banco].total = somarMoeda(dadosBancos[banco].total, valor);
                         dadosBancos[banco].qtd   += 1;
                     }
                 }
@@ -1586,7 +1756,7 @@
                     cardTot.innerText = `R$ ${formatarMoeda(dadosBancos[banco].total)}`;
                     cardQtd.innerText = `${dadosBancos[banco].qtd} pagamentos`;
                 }
-                totalGeralResumo += dadosBancos[banco].total;
+                totalGeralResumo = somarMoeda(totalGeralResumo, dadosBancos[banco].total);
                 qtdGeralResumo   += dadosBancos[banco].qtd;
 
                 if (!elTit || !elSoma || !elTot || !elDet) return;
@@ -1650,6 +1820,7 @@
             }
 
             salvarEstadoLocal();
+            filtrarTabela();
         }
 
         // ==========================================
@@ -1699,73 +1870,125 @@
             evento.target.value = '';
         }
 
-        async function processarArquivosPDF(arquivos) {
-            const tiposValidos = ["PP", "PD", "PH", "PI", "PS", "PV", "NO", "P4", "P5", "P8"];
-            let totalAdicionados = 0;
+        function informarOperacao(texto, tipo='info') {
+            const el=document.getElementById('status-operacao');
+            el.textContent=texto; el.dataset.kind=tipo;
+        }
 
-            for (const arquivo of arquivos) {
-                const buffer = await arquivo.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument(new Uint8Array(buffer)).promise;
-                let fornecedorPendente = null;
+        let importacaoEmAndamento = false;
 
-                for (let i = 1; i <= pdf.numPages; i++) {
-                    const pagina = await pdf.getPage(i);
-                    const conteudo = await pagina.getTextContent();
-
-                    let linhasPorY = {};
-                    conteudo.items.forEach(item => {
-                        let y = Math.round(item.transform[5]);
-                        let x = item.transform[4];
-                        let texto = item.str.trim();
-                        if (!texto) return;
-                        let chaveY = null;
-                        for (let yE in linhasPorY) {
-                            if (Math.abs(parseInt(yE) - y) <= 4) { chaveY = yE; break; }
-                        }
-                        if (!chaveY) { chaveY = y; linhasPorY[chaveY] = []; }
-                        linhasPorY[chaveY].push({ x, text: texto });
-                    });
-
-                    Object.keys(linhasPorY).sort((a, b) => b - a).forEach(y => {
-                        let campos = {};
-                        linhasPorY[y].sort((a, b) => a.x - b.x).forEach(item => {
-                            const col = colunaDoX(item.x);
-                            if (!col) return;
-                            campos[col] = campos[col] ? `${campos[col]} ${item.text}` : item.text;
-                        });
-
-                        const tpTexto = (campos.tp || '').trim();
-                        if (tiposValidos.includes(tpTexto)) {
-                            const matchCodBenef = (campos.beneficiario || '').match(/^(\d{5,10})/);
-                            const codBeneficiario = matchCodBenef ? matchCodBenef[1] : '';
-                            const nomeBenef = (campos.beneficiario || '').replace(/^\d{5,10}\s*/, '').trim();
-                            const fornecedor  = nomeBenef || fornecedorPendente || 'FORNECEDOR JDE';
-                            const voucher     = (campos.voucher   || '').trim();
-                            const valor       = (campos.valor     || '').trim();
-                            const fatura      = (campos.faturaRet || '').trim() || 'FATURA / RECIBO JDE';
-                            const vencimento  = (campos.dtVenc    || '').trim() || '-';
-                            const matchCodForn = (campos.fornecedor || '').match(/^(\d{5,10})/);
-                            const codFornecedor = matchCodForn ? matchCodForn[1] : codBeneficiario;
-
-                            if (voucher && valor) {
-                                if (adicionarLinhaTabela(fornecedor, voucher, fatura, vencimento,
-                                    valor, codBeneficiario, tpTexto, codFornecedor)) {
-                                    totalAdicionados++;
-                                }
-                            }
-                            fornecedorPendente = null;
-                        } else if (campos.beneficiario && !campos.valor && !campos.voucher) {
-                            const texto = campos.beneficiario.trim();
-                            if (texto && !/^(Total:|Relatório|Page|Beneficiário|Valor Total|Número Total)/.test(texto)) {
-                                fornecedorPendente = texto.replace(/^\d{5,10}\s*/, '').trim();
-                            }
-                        }
-                    });
+        function interpretarPaginasJDE(paginas) {
+            const pagamentos = [], grupos = [];
+            let grupo = [], totalPendente = null, totalRelatorio = null;
+            let quantidadeRelatorio = null;
+            const moedaRE = /^-?(?:\d{1,3}(?:\.\d{3})+|\d*),\d{2}-?$/;
+            for (const conteudo of paginas) {
+                const linhas = [];
+                for (const item of conteudo.items) {
+                    const texto = item.str.trim();
+                    if (!texto) continue;
+                    const y = item.transform[5], x = item.transform[4];
+                    let linha = linhas.find(l => Math.abs(l.y - y) <= 2);
+                    if (!linha) { linha = {y, itens: []}; linhas.push(linha); }
+                    linha.itens.push({x, text: texto});
+                }
+                const ordenadas = linhas.sort((a,b) => b.y-a.y).map(l => l.itens.sort((a,b)=>a.x-b.x));
+                for (let i=0; i<ordenadas.length; i++) {
+                    const itens = ordenadas[i];
+                    const texto = itens.map(t=>t.text).join(' ');
+                    const seguinte = (ordenadas[i+1] || []).map(t=>t.text).join(' ');
+                    if (/Valor Total a ser processado/.test(texto)) {
+                        const m = texto.match(/(-?[\d.]*,\d{2}-?)\s*$/);
+                        totalRelatorio = m ? valorEmCentavos(m[1]) : totalPendente;
+                        totalPendente = null; continue;
+                    }
+                    if (/Número Total de Pagamentos/.test(texto)) {
+                        const m = texto.match(/(\d+)\s*$/);
+                        quantidadeRelatorio = m ? Number(m[1]) : quantidadeRelatorio;
+                        continue;
+                    }
+                    if (/^\d+$/.test(texto) && /Número Total de Pagamentos/.test(seguinte)) {
+                        quantidadeRelatorio = Number(texto); continue;
+                    }
+                    if (moedaRE.test(texto)) { totalPendente = valorEmCentavos(texto); continue; }
+                    if (/^Total:/.test(texto)) {
+                        const m = texto.match(/(-?[\d.]*,\d{2}-?)\s*$/);
+                        const declarado = m ? valorEmCentavos(m[1]) : totalPendente;
+                        if (declarado === null || !grupo.length) throw new Error('Total de beneficiário sem detalhes completos.');
+                        const calculado = grupo.reduce((v,p)=>v+valorEmCentavos(p.valor),0);
+                        if (declarado !== calculado) throw new Error(`Divergência em ${grupo[0].fornecedor}: PDF ${formatarMoeda(declarado/100)}, extraído ${formatarMoeda(calculado/100)}.`);
+                        grupos.push({declarado, calculado}); grupo=[]; totalPendente=null; continue;
+                    }
+                    if (/^(R5504110|Relat|Beneficiário)/.test(texto)) continue;
+                    const campos = {};
+                    for (const item of itens) {
+                        const coluna=colunaDoX(item.x);
+                        if (coluna) campos[coluna]=[campos[coluna],item.text].filter(Boolean).join(' ');
+                    }
+                    const tipoDocumento=(campos.tp || '').trim();
+                    const voucher=(campos.voucher || '').trim();
+                    if (!TIPOS_DOC.includes(tipoDocumento)) {
+                        if (/^\d+$/.test(voucher) && campos.dtFatura && campos.valor) throw new Error(`Tipo de documento não reconhecido: ${tipoDocumento}.`);
+                        continue;
+                    }
+                    const beneficiario=(campos.beneficiario || '').match(/^(\d{5,10})\s*(.*)$/);
+                    if (!beneficiario || !voucher || !campos.cia || !campos.item || !campos.valor) throw new Error('Linha JDE incompleta. Nenhum pagamento deste lote foi importado.');
+                    valorEmCentavos(campos.valor);
+                    const fornecedorCodigo=(campos.fornecedor || '').match(/^(\d{5,10})/);
+                    const p={fornecedor:beneficiario[2],codBeneficiario:beneficiario[1],tipoDocumento,voucher,
+                        cia:campos.cia,item:campos.item,valor:campos.valor,
+                        fatura:campos.faturaRet || '',vencimento:campos.dtVenc || '-',
+                        codFornecedor:fornecedorCodigo ? fornecedorCodigo[1] : beneficiario[1]};
+                    p.chaveJDE=chaveLinhaJDE(p.codBeneficiario,p.tipoDocumento,p.voucher,p.cia,p.item,p.fatura,p.vencimento,p.valor);
+                    pagamentos.push(p); grupo.push(p); totalPendente=null;
                 }
             }
+            if (grupo.length || !pagamentos.length || totalRelatorio === null) throw new Error('Relatório incompleto: detalhes, total de beneficiário ou total geral ausentes.');
+            const total=pagamentos.reduce((v,p)=>v+valorEmCentavos(p.valor),0);
+            if (total !== totalRelatorio) throw new Error(`Total geral divergente: PDF ${formatarMoeda(totalRelatorio/100)}, extraído ${formatarMoeda(total/100)}.`);
+            const chaves=new Set();
+            for (const p of pagamentos) {
+                if (chaves.has(p.chaveJDE)) throw new Error('Itens JDE repetidos dentro do mesmo PDF. Confira o relatório.');
+                chaves.add(p.chaveJDE);
+            }
+            return {pagamentos,grupos,totalCentavos:total,quantidadeRelatorio};
+        }
 
-            alert(`Importação concluída! ${totalAdicionados} novos pagamentos adicionados de ${arquivos.length} arquivo(s).`);
-            calcularTotais();
+        async function processarArquivosPDF(arquivos) {
+            if (importacaoEmAndamento) { alert('Aguarde a importação atual terminar.'); return; }
+            if (Array.from(document.querySelectorAll('#tabela-pagamentos tr')).some(l=>!l.getAttribute('data-chave-jde'))) {
+                alert('Este rascunho foi importado na versão antiga. Exporte o Excel e o JSON para preservar seu trabalho, limpe o rascunho e reimporte os PDFs. Isso evita duplicação e recupera itens antes descartados.'); return;
+            }
+            importacaoEmAndamento=true;
+            informarOperacao('Lendo o relatório e conferindo os valores por beneficiário…');
+            const adicionadas=[];
+            const salvoAnterior=localStorage.getItem('smartpag_tabela');
+            try {
+                // Validar todos os arquivos antes de alterar a tabela.
+                const lote=[];
+                for (const arquivo of arquivos) {
+                    let pdf;
+                    try {
+                        pdf=await pdfjsLib.getDocument(new Uint8Array(await arquivo.arrayBuffer())).promise;
+                        const paginas=[];
+                        for (let i=1; i<=pdf.numPages; i++) paginas.push(await (await pdf.getPage(i)).getTextContent());
+                        lote.push(...interpretarPaginasJDE(paginas).pagamentos);
+                    } catch (err) { throw new Error(`${arquivo.name}: ${err.message}`); }
+                    finally { if (pdf) await pdf.destroy(); }
+                }
+                const tbody=document.getElementById('tabela-pagamentos');
+                for (const p of lote) {
+                    if (adicionarLinhaTabela(p.fornecedor,p.voucher,p.fatura,p.vencimento,p.valor,p.codBeneficiario,p.tipoDocumento,p.codFornecedor,p.chaveJDE)) adicionadas.push(tbody.lastElementChild);
+                }
+                calcularTotais();
+                informarOperacao(`Importação conferida: ${adicionadas.length} itens adicionados · ${lote.length-adicionadas.length} já existentes. Totais por beneficiário e total geral correspondem ao PDF.`, 'success');
+            } catch (err) {
+                adicionadas.forEach(l=>l.remove());
+                if (salvoAnterior === null) localStorage.removeItem('smartpag_tabela');
+                else localStorage.setItem('smartpag_tabela',salvoAnterior);
+                try { calcularTotais(); } catch (_) {}
+                informarOperacao('Importação cancelada. ' + err.message, 'error');
+            } finally { importacaoEmAndamento=false; }
         }
 
         // ==========================================
@@ -1802,8 +2025,12 @@
             aplicarModoEscuroSalvo();
             carregarRegras();
             carregarResponsavel();
-            carregarEstadoLocal();
-            calcularTotais();
+            try {
+                carregarEstadoLocal(); calcularTotais();
+                if (document.querySelectorAll('#tabela-pagamentos tr').length) informarOperacao('Rascunho recuperado. A distribuição e os ajustes salvos neste navegador foram preservados.');
+            }
+            catch (err) { alert('Rascunho inválido: os dados salvos foram preservados. ' + err.message); }
+            carregarConciliacao();
         };
     </script>
 </body>

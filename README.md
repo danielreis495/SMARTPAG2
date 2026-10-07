@@ -1,47 +1,44 @@
-# 🏦 SmartPag - Sistema de Distribuição & Conciliação Bancária
+# SmartPag — distribuição e conciliação de pagamentos
 
-Aplicação web desenvolvida em **Python** e **Streamlit** para processamento, distribuição por bancos e conciliação de pagamentos a partir do relatório **JDE R5504110 (Requisito de Caixa)**.
+Aplicação Streamlit com interface no navegador para o relatório JDE R5504110.
 
----
+## Executar
 
-## 🚀 Como executar localmente
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
 
-1. **Instale as dependências:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+`app.py` serve `index.html`. A interface lê o PDF com PDF.js, confere os valores e permite distribuir os pagamentos entre bancos. `pdf_processor.py` é um leitor Python independente, mantido para conferência; ele não é chamado pela interface. As bibliotecas da interface são carregadas de CDNs e exigem acesso à internet no carregamento inicial.
 
-2. **Inicie o aplicativo:**
-   ```bash
-   streamlit run app.py
-   ```
+## Conferência e importação
 
----
+- Todas as linhas são somadas em centavos e comparadas com o `Total:` de cada beneficiário e com o total geral do PDF.
+- Todos os arquivos selecionados são validados antes da inclusão na tabela. Uma divergência cancela a importação do lote.
+- A identificação inclui beneficiário, tipo, voucher, companhia, item, fatura, vencimento e valor original. Itens diferentes com o mesmo valor são preservados; reimportações idênticas não são duplicadas.
+- A quantidade de itens na tabela é diferente da quantidade de pagamentos indicada pelo JDE: vários itens podem compor o mesmo pagamento.
+- Para editar valores, use o formato brasileiro `1.500,00`; valores inválidos não são aceitos.
 
-## ☁️ Como publicar no Streamlit Community Cloud
+## Dados e conciliação
 
-1. Crie um repositório no **GitHub** (ex: `smartpag`).
-2. Faça o upload dos seguintes arquivos:
-   - `app.py`
-   - `pdf_processor.py`
-   - `requirements.txt`
-   - `.gitignore`
-   - `README.md`
-3. Acesse **[share.streamlit.io](https://share.streamlit.io/)** e faça login com sua conta do GitHub.
-4. Clique em **"New app"**:
-   - **Repository:** Selecione seu repositório do GitHub.
-   - **Branch:** `main`
-   - **Main file path:** `app.py`
-5. Clique em **"Deploy!"** e compartilhe o link gerado com as pessoas do seu setor.
+O rascunho, as regras de banco e as baixas da conciliação são salvos no navegador. Eles não são compartilhados automaticamente entre computadores e podem ser perdidos se o armazenamento do navegador for apagado. Exporte os arquivos JSON para guardar cópias e compartilhar pela rede.
 
----
+A exportação do lote mantém a tabela e inclui identificação JDE, agrupamento, valor original e ajuste. Limpe a tabela somente depois de confirmar que o arquivo foi salvo. A conciliação valida o JSON importado e recupera as baixas salvas ao recarregar a página. Exporte o JSON atualizado para transmitir essas baixas a outro usuário.
 
-## ✨ Funcionalidades
+**Rascunhos anteriores à correção de outubro/2026:** exporte Excel e JSON para preservar a distribuição, limpe a tabela e reimporte os PDFs. A importação sobre linhas antigas é bloqueada porque elas não registram companhia/item e podem conter itens descartados pela identificação antiga.
 
-- **Importação de múltiplos PDFs do JDE (R5504110)** com extração de alta precisão baseada em coordenadas via `pdfplumber`.
-- **Validação de Reconciliação** com conferência contra o rodapé do relatório.
-- **Distribuição de Bancos e Classificações** com edição em tabela interativa.
-- **Regras Automáticas de Bancos** por tipo de documento (`PP, PD, PH, PI, PS, PV, NO, P4, P5, P8`) e código de beneficiário.
-- **Fitas de Cálculo e Resumo por Banco** (Itaú, Santander, Bradesco, Caixa, Banco do Brasil) com totais e contagens.
-- **Exportação para Excel (.xlsx)** e **JSON** para histórico e conciliação.
-- **Aba de Conciliação Diária** com controle de baixa e registro do responsável.
+## Filtros e agrupamento
+
+Os cards e fitas exibem o lote completo. Excel e relatório por banco respeitam as linhas visíveis nos filtros. Grupos são contados uma única vez; o total permanece correto mesmo antes de selecionar um banco. A consolidação automática separa beneficiário, tipo de documento, voucher e companhia.
+
+## Verificação
+
+```bash
+node --test tests/*.test.cjs
+```
+
+Os testes cobrem identificação dos itens, centavos, valores inválidos, edição repetida, grupos sem banco, validação da conciliação, escape de HTML e conferência do PDF com total divergente ou ausente.
+
+## Publicação no Streamlit
+
+Selecione o repositório `danielreis495/SMARTPAG2`, branch `main`, arquivo principal `app.py`. O repositório não registra o endereço da implantação ativa; confira a versão publicada no painel do Streamlit após atualizar a branch.
