@@ -189,8 +189,18 @@
             #aba-resumo > section > h2 { color:#526277!important; }
             #aba-resumo > section button { background:#edf2f7!important; color:#334155!important; border:1px solid #d7e0e9; }
             #aba-distribuicao section button { font-size:12px; box-shadow:none!important; }
-            #tabela-pagamentos tr { background:white!important; }
-            #tabela-pagamentos tr:hover { background:#f6f9fc!important; }
+            #tabela-pagamentos tr { background:var(--cor-linha,white)!important; }
+            #tabela-pagamentos tr:hover { background:var(--cor-linha,#f6f9fc)!important; }
+            #tabela-pagamentos tr[data-banco="itau"] { --cor-linha:#f0fdf4; }
+            #tabela-pagamentos tr[data-banco="santander"] { --cor-linha:#fefce8; }
+            #tabela-pagamentos tr[data-banco="bradesco"] { --cor-linha:#fff7ed; }
+            #tabela-pagamentos tr[data-banco="caixa"] { --cor-linha:#eff6ff; }
+            #tabela-pagamentos tr[data-banco="brasil"] { --cor-linha:#fdf2f8; }
+            body.dark-mode #tabela-pagamentos tr[data-banco="itau"] { --cor-linha:#052e16; }
+            body.dark-mode #tabela-pagamentos tr[data-banco="santander"] { --cor-linha:#422006; }
+            body.dark-mode #tabela-pagamentos tr[data-banco="bradesco"] { --cor-linha:#431407; }
+            body.dark-mode #tabela-pagamentos tr[data-banco="caixa"] { --cor-linha:#172554; }
+            body.dark-mode #tabela-pagamentos tr[data-banco="brasil"] { --cor-linha:#500724; }
             #tabela-pagamentos tr.linha-imposto { color:#64748b; }
             button:focus-visible, input:focus-visible, select:focus-visible, label:focus-within { outline:2px solid #3b82f6; outline-offset:2px; }
             .operation-status { margin:12px 0; padding:12px 16px; background:#eef4f8; border:1px solid #dbe6ef; border-radius:9px; font-size:13px; color:#334155; }
@@ -199,8 +209,8 @@
             body.dark-mode header, body.dark-mode main>div { border-color:#374151!important; }
             body.dark-mode #aba-distribuicao > section > div:first-child { background:#273449!important; color:#cbd5e1!important; border-color:#374151; }
             body.dark-mode #aba-distribuicao > section > div:first-child button { background:#334155!important; color:#cbd5e1!important; border-color:#475569!important; }
-            body.dark-mode #tabela-pagamentos tr { background:#1f2937!important; }
-            body.dark-mode #tabela-pagamentos tr:hover { background:#273449!important; }
+            body.dark-mode #tabela-pagamentos tr { background:var(--cor-linha,#1f2937)!important; }
+            body.dark-mode #tabela-pagamentos tr:hover { background:var(--cor-linha,#273449)!important; }
             body.dark-mode .tabela-fixa th { background:#273449!important; color:#cbd5e1; }
             body.dark-mode #dashboard-total { color:#dbeafe!important; }
             body.dark-mode #aba-resumo > section { background:#172033!important; border-color:#374151; }
@@ -1583,6 +1593,7 @@
             const banco = selectElement.value;
             const linha = selectElement.closest('tr');
 
+            linha.setAttribute('data-banco', banco);
             const eraImposto = linha.classList.contains('linha-imposto');
             linha.className = 'border-b hover:bg-gray-100 transition-colors duration-300';
             if (eraImposto) linha.classList.add('linha-imposto');
