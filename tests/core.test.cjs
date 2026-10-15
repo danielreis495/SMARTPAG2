@@ -30,6 +30,13 @@ test('unassigned group counted once in dashboard',()=>{
  const c=load(['escaparHTML','valorEmCentavos','textoParaNumero','somarMoeda','formatarMoeda','calcularTotais'],{document:{getElementById:get,querySelectorAll:()=>[row('100,00'),row('10,00-')]},BANCOS_NOMES:['itau'],BANCOS_LABEL:{itau:'Itaú'},salvarEstadoLocal(){},filtrarTabela(){}});
  c.calcularTotais();assert.equal(get('dashboard-total').innerText,'R$ 90,00');
 });
+test('bank report lists a grouped payment once with the summed value',()=>{
+ const row=(grupo,forn,vouc,fat,valor)=>({getAttribute:k=>k==='data-grupo'?grupo:null,hasAttribute:k=>k==='data-grupo'&&!!grupo,querySelector:s=>s==='.valor-texto'?{innerText:valor}:{value:''},querySelectorAll:()=>['',forn,vouc,fat,'05/10/26'].map(innerText=>({innerText}))});
+ const c=load(['escaparHTML','valorEmCentavos','textoParaNumero','somarMoeda','formatarMoeda','detalharPagamentosBanco']);
+ const html=c.detalharPagamentosBanco([row('g1','🔗 Nilko','166768','NF 10','100,00'),row(null,'Outro','170000','NF 20','50,00'),row('g1','↳ Nilko','166768','IRRF','10,00-')]);
+ assert.match(html,/2 pagamento\(s\)/);assert.equal((html.match(/<tr style="break-inside/g)||[]).length,2);
+ assert.match(html,/Pagamento agrupado · 2 item\(ns\)/);assert.match(html,/NF 10, IRRF/);assert.match(html,/>90,00</);
+});
 test('markup from imported text is escaped',()=>{const c=load(['escaparHTML']);assert.equal(c.escaparHTML('<img src=x onerror="alert(1)">'),'&lt;img src=x onerror=&quot;alert(1)&quot;&gt;')});
 function parserContext(){
  const c=load(['valorEmCentavos','textoParaNumero','formatarMoeda','chaveLinhaJDE','interpretarPaginasJDE'],{TIPOS_DOC:['PV']});

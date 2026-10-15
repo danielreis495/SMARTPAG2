@@ -1163,29 +1163,50 @@
         // ==========================================
         // RELATÓRIO PDF POR BANCO
         // ==========================================
+        // Um pagamento por linha do relatório: itens agrupados (🔗) viram uma única linha com o valor somado.
         function detalharPagamentosBanco(linhas) {
-            const itens = linhas.map(linha => {
-                const col = linha.querySelectorAll('td');
-                const origem = JSON.parse(linha.getAttribute('data-chave-jde') || 'null');
-                const documento = col[2].innerText + (origem ? ` / item ${origem[4]}` : '');
-                const observacao = [linha.querySelector('.obs-input')?.value,
-                    linha.getAttribute('data-ajuste')].filter(Boolean).join(' · ');
+            const pagamentos = [], porGrupo = {};
+            linhas.forEach(linha => {
+                const grupoId = linha.getAttribute('data-grupo');
+                if (!grupoId) { pagamentos.push([linha]); return; }
+                if (!porGrupo[grupoId]) pagamentos.push(porGrupo[grupoId] = []);
+                porGrupo[grupoId].push(linha);
+            });
+            const unicos = lista => [...new Set(lista.filter(Boolean))].join(', ');
+            const itens = pagamentos.map((itensPagamento, i) => {
+                const dados = itensPagamento.map(linha => {
+                    const col = linha.querySelectorAll('td');
+                    const origem = JSON.parse(linha.getAttribute('data-chave-jde') || 'null');
+                    return {
+                        fornecedor: col[1].innerText.replace('🔗 ','').replace('↳ ',''),
+                        documento:  col[2].innerText + (origem ? ` / item ${origem[4]}` : ''),
+                        voucher:    col[2].innerText,
+                        fatura:     col[3].innerText,
+                        vencimento: col[4].innerText,
+                        valor:      textoParaNumero(linha.querySelector('.valor-texto').innerText),
+                        observacao: [linha.querySelector('.obs-input')?.value, linha.getAttribute('data-ajuste')].filter(Boolean).join(' · ')
+                    };
+                });
+                const agrupado = dados.length > 1 || itensPagamento[0].hasAttribute('data-grupo');
+                const valor = dados.reduce((total, d) => somarMoeda(total, d.valor), 0);
                 return `<tr style="break-inside:avoid;">
-                    <td>${escaparHTML(col[1].innerText.replace('🔗 ','').replace('↳ ',''))}${linha.getAttribute('data-grupo') ? '<br><small>Pagamento agrupado</small>' : ''}</td>
-                    <td>${escaparHTML(documento)}</td>
-                    <td>${escaparHTML(col[3].innerText)}</td>
-                    <td>${escaparHTML(col[4].innerText)}</td>
-                    <td style="text-align:right;white-space:nowrap;">${formatarMoeda(textoParaNumero(linha.querySelector('.valor-texto').innerText))}</td>
-                    <td>${escaparHTML(observacao)}</td>
+                    <td style="text-align:center;">${i + 1}</td>
+                    <td>${escaparHTML(unicos(dados.map(d => d.fornecedor)))}${agrupado ? `<br><small>Pagamento agrupado · ${dados.length} item(ns)</small>` : ''}</td>
+                    <td>${escaparHTML(agrupado ? unicos(dados.map(d => d.voucher)) : dados[0].documento)}</td>
+                    <td>${escaparHTML(unicos(dados.map(d => d.fatura)))}</td>
+                    <td>${escaparHTML(unicos(dados.map(d => d.vencimento)))}</td>
+                    <td style="text-align:right;white-space:nowrap;">${formatarMoeda(valor)}</td>
+                    <td>${escaparHTML(unicos(dados.map(d => d.observacao)))}</td>
                 </tr>`;
             }).join('');
             return `<div class="detalhamento-banco" style="padding:12px;">
-                <h2 style="font-size:12px;font-weight:bold;margin-bottom:8px;">Detalhamento dos fornecedores — ${linhas.length} item(ns)</h2>
+                <h2 style="font-size:12px;font-weight:bold;margin-bottom:8px;">Detalhamento dos pagamentos — ${pagamentos.length} pagamento(s)</h2>
                 <table class="tabela-detalhamento" style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:10px;">
                     <thead style="display:table-header-group;background:#f3f4f6;"><tr>
-                        <th style="width:24%;">Fornecedor</th><th style="width:17%;">Voucher / Item</th>
-                        <th style="width:16%;">Fatura</th><th style="width:12%;">Vencimento</th>
-                        <th style="width:14%;text-align:right;">Valor (R$)</th><th style="width:17%;">Observação / Ajuste</th>
+                        <th style="width:5%;text-align:center;">Nº</th>
+                        <th style="width:23%;">Fornecedor</th><th style="width:15%;">Voucher / Item</th>
+                        <th style="width:17%;">Fatura</th><th style="width:12%;">Vencimento</th>
+                        <th style="width:13%;text-align:right;">Valor (R$)</th><th style="width:15%;">Observação / Ajuste</th>
                     </tr></thead><tbody>${itens}</tbody>
                 </table></div>`;
         }
